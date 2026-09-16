@@ -3,6 +3,7 @@ const router = express.Router();
 const pool = require('../config/mysql');
 const { validateGeofence, calculateHaversineDistance } = require('../services/spatialService');
 const { encryptData, decryptData, generatePresignedUrl } = require('../services/encryptionService');
+const { sendOtpEmail } = require('../services/emailService');
 
 // -------------------------------------------------------------
 // CATALOG LAYANAN SPESIALIS KANGGO-STYLE
@@ -133,12 +134,12 @@ router.post('/auth/request-otp', async (req, res) => {
             VALUES (?, ?, ?, NOW() + INTERVAL 10 MINUTE, 0)
         `, [cleanEmail, otpCode, type || 'login']);
 
-        console.log(`[EMAIL OTP SERVICE] Sent OTP ${otpCode} to ${cleanEmail} for ${type}`);
+        // Dispatch Email Asli via SMTP / Sendmail
+        sendOtpEmail(cleanEmail, otpCode, type || 'login');
 
         res.json({
             success: true,
-            message: `Kode OTP 6-digit berhasil dikirim ke ${cleanEmail}!`,
-            otp_preview: otpCode, // Ditampilkan untuk demo real-time
+            message: `Kode OTP 6-digit telah dikirim ke kotak masuk email ${cleanEmail}. Silakan cek inbox/spam email Anda.`,
             expires_in_minutes: 10
         });
     } catch (err) {

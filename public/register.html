@@ -105,7 +105,7 @@
             <!-- Input OTP 6 Digit -->
             <div>
                 <label class="block text-slate-700 dark:text-slate-300 font-bold mb-1">Masukkan Kode OTP (6 Digit)</label>
-                <input type="text" id="reg-otp-code" required maxlength="6" placeholder="123456" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-center text-slate-900 dark:text-white font-mono font-black text-base tracking-widest focus:outline-none focus:border-amber-500">
+                <input type="text" id="reg-otp-code" required maxlength="6" placeholder="______" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-center text-slate-900 dark:text-white font-mono font-black text-base tracking-widest focus:outline-none focus:border-amber-500">
             </div>
 
             <!-- Nomor HP / WhatsApp -->
@@ -209,9 +209,8 @@
                 if (json.success) {
                     const hint = document.getElementById('reg-otp-hint');
                     hint.classList.remove('hidden');
-                    hint.innerText = `✅ OTP terkirim! (Kode Demo: ${json.otp_preview})`;
-                    document.getElementById('reg-otp-code').value = json.otp_preview;
-                    alert(`Kode OTP 6-digit berhasil dikirim ke ${email}!\nKode OTP: ${json.otp_preview}`);
+                    hint.innerText = `✅ Kode OTP telah dikirim ke kotak masuk email Anda!`;
+                    alert(json.message);
                 } else {
                     alert(`❌ ${json.message}`);
                 }

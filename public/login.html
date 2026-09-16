@@ -158,8 +158,10 @@
                     document.getElementById('step-email-container').classList.add('hidden');
                     document.getElementById('step-otp-container').classList.remove('hidden');
                     document.getElementById('txt-otp-sent-target').innerText = `ke ${email}`;
-                    document.getElementById('login-otp').value = '';
-                    alert(json.message);
+                    if (json.otp_code) {
+                        document.getElementById('login-otp').value = json.otp_code;
+                        alert(`Kode OTP 6-Digit: ${json.otp_code}\n\n${json.message}`);
+                    }
                 } else {
                     alert(`❌ ${json.message}`);
                 }

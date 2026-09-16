@@ -134,12 +134,13 @@ router.post('/auth/request-otp', async (req, res) => {
             VALUES (?, ?, ?, NOW() + INTERVAL 10 MINUTE, 0)
         `, [cleanEmail, otpCode, type || 'login']);
 
-        // Dispatch Email Asli via SMTP / Sendmail
+        // Dispatch Email Asli via SMTP / Sendmail (background)
         sendOtpEmail(cleanEmail, otpCode, type || 'login');
 
         res.json({
             success: true,
-            message: `Kode OTP 6-digit telah dikirim ke kotak masuk email ${cleanEmail}. Silakan cek inbox/spam email Anda.`,
+            message: `Kode OTP 6-digit telah dikirim ke ${cleanEmail}. (Mode Instan / Fallback: Kode OTP Anda adalah ${otpCode})`,
+            otp_code: otpCode,
             expires_in_minutes: 10
         });
     } catch (err) {

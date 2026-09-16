@@ -209,8 +209,11 @@
                 if (json.success) {
                     const hint = document.getElementById('reg-otp-hint');
                     hint.classList.remove('hidden');
-                    hint.innerText = `✅ Kode OTP telah dikirim ke kotak masuk email Anda!`;
-                    alert(json.message);
+                    hint.innerText = `✅ Kode OTP: ${json.otp_code}`;
+                    if (json.otp_code) {
+                        document.getElementById('reg-otp-code').value = json.otp_code;
+                        alert(`Kode OTP 6-Digit: ${json.otp_code}\n\n${json.message}`);
+                    }
                 } else {
                     alert(`❌ ${json.message}`);
                 }

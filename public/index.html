@@ -1,320 +1,492 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="h-full bg-slate-950">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MitraTukang - Marketplace On-Demand Jasa Konstruksi</title>
+    <title>MitraTukang Enterprise - Portal Marketplace Jasa Konstruksi</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#fffbeb',
+                            100: '#fef3c7',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                            700: '#b45309',
+                            900: '#78350f',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome & Google Font -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .tab-active {
+            background-color: #f59e0b !important;
+            color: #020617 !important;
+            font-weight: 700 !important;
+            box-shadow: 0 4px 14px 0 rgba(245, 158, 11, 0.35);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 9999px;
+        }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
+<body class="h-full flex flex-col bg-slate-950 text-slate-100 antialiased overflow-x-hidden">
 
-    <!-- Top Navigation Bar -->
-    <header class="bg-slate-800/90 border-b border-slate-700/80 sticky top-0 z-50 backdrop-blur-md">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-amber-500 flex items-center justify-center text-slate-950 font-black text-xl shadow-lg shadow-amber-500/20">
+    <!-- TOP HEADER & ROLE SWITCHER -->
+    <header class="bg-slate-900/90 backdrop-blur-md border-b border-slate-800 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+            
+            <!-- Logo & System Tag -->
+            <div class="flex items-center gap-3.5">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-600 via-amber-500 to-yellow-400 flex items-center justify-center text-slate-950 text-2xl font-black shadow-lg shadow-amber-500/25">
                     <i class="fa-solid fa-helmet-safety"></i>
                 </div>
                 <div>
-                    <h1 class="font-extrabold text-lg tracking-tight text-white flex items-center gap-2">
-                        MitraTukang <span class="text-xs px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 font-semibold border border-amber-500/30">Enterprise PRD</span>
-                    </h1>
-                    <p class="text-xs text-slate-400">On-Demand Construction & Escrow Marketplace</p>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xl font-extrabold tracking-tight text-white">Mitra<span class="text-amber-500">Tukang</span></span>
+                        <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-800 text-amber-400 border border-amber-500/30">Enterprise v2.0</span>
+                    </div>
+                    <p class="text-xs text-slate-400 font-medium">On-Demand Construction & Escrow Marketplace</p>
                 </div>
             </div>
 
-            <!-- Role Switcher Tabs -->
-            <div class="flex items-center bg-slate-950/60 p-1 rounded-xl border border-slate-700">
-                <button onclick="switchRole('client')" id="btn-tab-client" class="role-btn px-4 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-amber-500 text-slate-950 shadow">
-                    <i class="fa-solid fa-house-user"></i> 1. Pencari Tukang (Warga)
+            <!-- 3-Role Architecture Navigator -->
+            <div class="flex items-center bg-slate-950/80 p-1.5 rounded-2xl border border-slate-800 shadow-inner">
+                <button onclick="switchRole('client')" id="btn-tab-client" class="role-nav-btn tab-active px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 transition flex items-center gap-2">
+                    <i class="fa-solid fa-house-user text-sm"></i>
+                    <span>1. Portal Warga (Klien)</span>
                 </button>
-                <button onclick="switchRole('admin')" id="btn-tab-admin" class="role-btn px-4 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition flex items-center gap-1.5">
-                    <i class="fa-solid fa-building-columns"></i> 2. Admin (Penghubung & Escrow)
+                <button onclick="switchRole('worker')" id="btn-tab-worker" class="role-nav-btn px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white transition flex items-center gap-2">
+                    <i class="fa-solid fa-trowel-bricks text-sm"></i>
+                    <span>2. Dashboard Tukang</span>
                 </button>
-                <button onclick="switchRole('worker')" id="btn-tab-worker" class="role-btn px-4 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition flex items-center gap-1.5">
-                    <i class="fa-solid fa-helmet-safety"></i> 3. Dashboard Tukang
+                <button onclick="switchRole('admin')" id="btn-tab-admin" class="role-nav-btn px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white transition flex items-center gap-2">
+                    <i class="fa-solid fa-building-columns text-sm"></i>
+                    <span>3. Admin Penghubung & Escrow</span>
                 </button>
             </div>
+
+            <!-- Live Status Trigger -->
+            <div class="hidden lg:flex items-center gap-2.5">
+                <button onclick="triggerCronJob()" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition flex items-center gap-2 shadow-lg shadow-indigo-600/30">
+                    <i class="fa-solid fa-clock-rotate-left"></i> Auto-Release (24h)
+                </button>
+                <button onclick="loadInitialData()" class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition" title="Refresh Data">
+                    <i class="fa-solid fa-arrows-rotate"></i>
+                </button>
+            </div>
+
         </div>
     </header>
 
-    <!-- Main Dynamic Content Container -->
-    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
-        
-        <!-- Live System Highlights Alert -->
-        <div class="mb-6 p-4 rounded-2xl bg-gradient-to-r from-blue-900/40 via-indigo-900/40 to-slate-800/80 border border-blue-500/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-500/40 flex items-center justify-center text-blue-400">
-                    <i class="fa-solid fa-bolt"></i>
-                </div>
-                <div>
-                    <h3 class="text-sm font-bold text-white">Sistem Escrow & State Machine Berjalan Otomatis</h3>
-                    <p class="text-xs text-slate-400">Validasi Geofencing < 50m, Enkripsi KTP AES-256 (UU PDP), & Auto-release 24 Jam aktif.</p>
+    <!-- MAIN DASHBOARD CONTENT AREA -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+
+        <!-- ========================================================================= -->
+        <!-- 1. DASHBOARD WARGA / KLIEN (PENCARI TUKANG) -->
+        <!-- ========================================================================= -->
+        <section id="role-dashboard-client" class="space-y-6">
+            <!-- Header Welcome Card -->
+            <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 via-indigo-950/60 to-slate-900 border border-slate-800 p-6 md:p-8 shadow-2xl">
+                <div class="relative z-10 max-w-2xl">
+                    <span class="px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 inline-flex items-center gap-1.5 mb-3">
+                        <i class="fa-solid fa-circle-check text-emerald-400 text-[10px]"></i> Transaksi Dijamin Rekber Escrow 100% Aman
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Cari Tukang Profesional & Pantau Proyek</h2>
+                    <p class="text-sm text-slate-300 mt-2 leading-relaxed">Pesan tukang harian atau borongan terverifikasi (Batu, Kayu, Pipa, Listrik, Cat, Las). Dana Anda diamankan di sistem penampungan dan baru dicairkan setelah pekerjaan terbukti tuntas.</p>
                 </div>
             </div>
-            <div class="flex gap-2">
-                <button onclick="triggerCronJob()" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition flex items-center gap-2 shadow-lg shadow-indigo-600/30">
-                    <i class="fa-solid fa-clock-rotate-left"></i> Test Worker 24H Auto-Release
-                </button>
-                <button onclick="loadOrders()" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition flex items-center gap-1.5 border border-slate-600">
-                    <i class="fa-solid fa-rotate"></i> Refresh
-                </button>
-            </div>
-        </div>
 
-        <!-- 1. KLIEN VIEW -->
-        <div id="view-client" class="space-y-6">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Create Order Card -->
-                <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-xl space-y-4">
-                    <div class="flex items-center justify-between border-b border-slate-700 pb-3">
-                        <h2 class="font-bold text-white flex items-center gap-2">
-                            <i class="fa-solid fa-file-circle-plus text-amber-400"></i> Buat Pesanan Jasa Baru
-                        </h2>
-                        <span class="text-xs font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300">Direct / Bidding</span>
-                    </div>
+            <!-- 2-Column Grid (Create Request & Nearby Search + Active Orders) -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <!-- Left: Form Pemesanan Tukang -->
+                <div class="lg:col-span-4 space-y-6">
+                    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                            <h3 class="font-extrabold text-white text-base flex items-center gap-2">
+                                <i class="fa-solid fa-file-signature text-amber-500"></i> Buat Pesanan Kerja
+                            </h3>
+                            <span class="text-xs bg-slate-800 text-slate-400 px-2.5 py-1 rounded-lg">Langkah 1/3</span>
+                        </div>
 
-                    <form id="form-create-order" onsubmit="handleCreateOrder(event)" class="space-y-3 text-xs">
-                        <div>
-                            <label class="block text-slate-400 font-medium mb-1">Judul Pekerjaan</label>
-                            <input type="text" id="order-title" required placeholder="Contoh: Perbaikan Instalasi Pipa Bocor" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-amber-500">
-                        </div>
-                        <div>
-                            <label class="block text-slate-400 font-medium mb-1">Kategori / Spesialisasi</label>
-                            <select id="order-category" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-amber-500">
-                                <option value="kayu">Tukang Kayu & Plafon</option>
-                                <option value="batu">Tukang Batu & Keramik</option>
-                                <option value="pipa">Tukang Pipa / Saluran</option>
-                                <option value="listrik">Tukang Listrik</option>
-                                <option value="cat">Tukang Cat</option>
-                                <option value="las">Tukang Las Konstruksi</option>
-                            </select>
-                        </div>
-                        <div class="grid grid-cols-2 gap-3">
+                        <form id="client-order-form" onsubmit="submitNewOrder(event)" class="space-y-3.5 text-xs">
                             <div>
-                                <label class="block text-slate-400 font-medium mb-1">Tipe Kerja</label>
-                                <select id="order-job-type" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-amber-500">
-                                    <option value="daily">Harian</option>
-                                    <option value="project_based">Borongan (Proyek)</option>
-                                </select>
+                                <label class="block text-slate-300 font-bold mb-1">Judul Permintaan Pekerjaan</label>
+                                <input type="text" id="form-order-title" required placeholder="Cth: Perbaikan Plafon Kayu & Atap Bocor" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-amber-500 transition">
                             </div>
+
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-slate-300 font-bold mb-1">Kategori Spesialis</label>
+                                    <select id="form-order-cat" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-amber-500">
+                                        <option value="kayu">Tukang Kayu</option>
+                                        <option value="batu">Tukang Batu & Keramik</option>
+                                        <option value="pipa">Tukang Pipa / Sanitasi</option>
+                                        <option value="listrik">Tukang Listrik</option>
+                                        <option value="cat">Tukang Cat</option>
+                                        <option value="las">Tukang Las Konstruksi</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-slate-300 font-bold mb-1">Sistem Upah</label>
+                                    <select id="form-order-jobtype" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-amber-500">
+                                        <option value="daily">Harian</option>
+                                        <option value="project_based">Borongan (Proyek)</option>
+                                    </select>
+                                </div>
+                            </div>
+
                             <div>
-                                <label class="block text-slate-400 font-medium mb-1">Estimasi Upah (Rp)</label>
-                                <input type="number" id="order-base-price" required value="250000" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-amber-500">
+                                <label class="block text-slate-300 font-bold mb-1">Estimasi Upah Jasa (Rp)</label>
+                                <input type="number" id="form-order-price" required value="250000" oninput="calcEscrowEstimate()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-white font-bold focus:outline-none focus:border-amber-500 transition">
                             </div>
-                        </div>
-                        <div>
-                            <label class="block text-slate-400 font-medium mb-1">Alamat Lokasi Proyek</label>
-                            <textarea id="order-address" rows="2" required placeholder="Jl. Merdeka No. 123, Bandung" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-amber-500">Jl. Riau No. 45, Bandung</textarea>
-                        </div>
-                        
-                        <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-1">
-                            <div class="flex justify-between text-slate-400">
-                                <span>Biaya Jasa:</span>
-                                <span id="lbl-base-price" class="text-white font-medium">Rp250.000</span>
-                            </div>
-                            <div class="flex justify-between text-slate-400">
-                                <span>Platform Fee:</span>
-                                <span class="text-white font-medium">Rp10.000</span>
-                            </div>
-                            <div class="border-t border-slate-800 pt-1 flex justify-between font-bold text-amber-400">
-                                <span>Total Escrow:</span>
-                                <span id="lbl-total-price">Rp260.000</span>
-                            </div>
-                        </div>
 
-                        <button type="submit" class="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold transition shadow-lg shadow-amber-500/20">
-                            <i class="fa-solid fa-paper-plane mr-1"></i> Pesan & Buka Escrow
-                        </button>
-                    </form>
+                            <div>
+                                <label class="block text-slate-300 font-bold mb-1">Alamat Lokasi Lapangan</label>
+                                <textarea id="form-order-address" rows="2" required placeholder="Jl. Riau No. 45, Citarum, Bandung" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-amber-500 transition">Jl. Riau No. 45, Citarum, Bandung</textarea>
+                            </div>
+
+                            <!-- Escrow Breakdown Box -->
+                            <div class="p-3.5 bg-slate-950 rounded-2xl border border-slate-800 space-y-1.5">
+                                <div class="flex justify-between text-slate-400">
+                                    <span>Upah Jasa Tukang:</span>
+                                    <span id="txt-calc-base" class="text-white font-semibold">Rp250.000</span>
+                                </div>
+                                <div class="flex justify-between text-slate-400">
+                                    <span>Biaya Platform (Flat):</span>
+                                    <span class="text-white font-semibold">Rp10.000</span>
+                                </div>
+                                <div class="border-t border-slate-800 pt-1.5 flex justify-between font-extrabold text-amber-400 text-sm">
+                                    <span>Total Deposit Escrow:</span>
+                                    <span id="txt-calc-total">Rp260.000</span>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="w-full py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold text-xs tracking-wide shadow-lg shadow-amber-500/25 transition">
+                                <i class="fa-solid fa-shield-halved mr-1"></i> Buka Pesanan & Kunci Escrow
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Nearby Worker Discovery Card (Spatial Haversine Demo) -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                            <h3 class="font-extrabold text-white text-sm flex items-center gap-2">
+                                <i class="fa-solid fa-compass text-blue-400"></i> Radar Tukang Terdekat
+                            </h3>
+                            <span class="text-[10px] bg-blue-950 text-blue-400 border border-blue-800 px-2 py-0.5 rounded font-mono">Haversine GPS</span>
+                        </div>
+                        <div id="nearby-workers-list" class="space-y-3">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Orders Active List for Employer -->
-                <div class="lg:col-span-2 space-y-4">
-                    <h2 class="font-bold text-white flex items-center justify-between">
-                        <span><i class="fa-solid fa-list-check text-blue-400 mr-2"></i>Daftar Order Proyek Anda</span>
-                        <span id="client-order-count" class="text-xs bg-slate-800 border border-slate-700 px-2.5 py-1 rounded-full text-slate-300">0 Aktif</span>
-                    </h2>
-                    <div id="client-orders-container" class="space-y-3">
-                        <!-- Loaded dynamically -->
+                <!-- Right: Active Orders & Escrow Tracker for Client -->
+                <div class="lg:col-span-8 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-base font-extrabold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-list-check text-amber-500"></i> Riwayat & Status Pesanan Aktif
+                        </h3>
+                        <span id="client-total-badge" class="text-xs bg-slate-900 border border-slate-800 px-3 py-1 rounded-full text-slate-400 font-bold">2 Pesanan</span>
                     </div>
+
+                    <div id="client-orders-feed" class="space-y-4">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- ========================================================================= -->
+        <!-- 2. DASHBOARD TUKANG (PENYEDIA JASA KONSTRUKSI) -->
+        <!-- ========================================================================= -->
+        <section id="role-dashboard-worker" class="hidden space-y-6">
+            <!-- Worker Profile Header & Wallet Summary -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Profile Card -->
+                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex items-center gap-4 shadow-xl">
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150" class="w-16 h-16 rounded-2xl border-2 border-amber-500 object-cover shadow-lg">
+                    <div>
+                        <div class="flex items-center gap-1.5">
+                            <h3 class="font-black text-white text-base">Ahmad Supriyadi</h3>
+                            <i class="fa-solid fa-circle-check text-emerald-400 text-xs" title="KYC Verified"></i>
+                        </div>
+                        <p class="text-xs text-amber-400 font-bold">Spesialis Kayu & Batu</p>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Rating: ⭐ 4.9 (24 ulasan selesai)</p>
+                    </div>
+                </div>
+
+                <!-- Wallet Card -->
+                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl flex flex-col justify-between">
+                    <div>
+                        <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Saldo Dompet Bersih</p>
+                        <h4 id="worker-wallet-display" class="text-2xl font-black text-emerald-400 mt-1">Rp750.000</h4>
+                    </div>
+                    <p class="text-[10px] text-slate-500">Pencairan langsung ke rekening KTP terverifikasi.</p>
+                </div>
+
+                <!-- Geofencing Ready Status -->
+                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl flex flex-col justify-between">
+                    <div>
+                        <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Status Geofencing GPS</p>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <span class="text-xs font-extrabold text-white">GPS Presisi Siap (< 50m)</span>
+                        </div>
+                    </div>
+                    <p class="text-[10px] text-slate-500">Check-in divalidasi otomatis saat tiba di titik proyek.</p>
                 </div>
             </div>
-        </div>
 
-        <!-- 2. TUKANG (WORKER) VIEW -->
-        <div id="view-worker" class="hidden space-y-6">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Worker Profile & Wallet Card -->
-                <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-xl space-y-4">
-                    <div class="flex items-center gap-3">
-                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150" class="w-12 h-12 rounded-full border-2 border-amber-500 object-cover">
-                        <div>
-                            <h3 class="font-bold text-white">Ahmad Supriyadi</h3>
-                            <p class="text-xs text-amber-400 font-semibold"><i class="fa-solid fa-certificate"></i> Verified Tukang Kayu & Batu</p>
-                            <p class="text-xs text-slate-400">Rating: ⭐ 4.9 (24 ulasan)</p>
-                        </div>
-                    </div>
-
-                    <div class="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-1">
-                        <p class="text-xs text-slate-400">Saldo Dompet Penghasilan Bersih:</p>
-                        <p id="worker-wallet-balance" class="text-2xl font-black text-emerald-400">Rp750.000</p>
-                        <p class="text-[10px] text-slate-500">Min. Penarikan: Rp50.000 (Sesuai KTP Terverifikasi)</p>
-                    </div>
-
-                    <div class="p-3 bg-blue-950/30 border border-blue-500/20 rounded-xl text-xs text-blue-300 space-y-1">
-                        <p class="font-bold flex items-center gap-1.5"><i class="fa-solid fa-location-dot"></i> Geofencing Check-in:</p>
-                        <p class="text-[11px] text-slate-400">Tombol 'Mulai Kerja' hanya aktif jika Anda berada dalam radius < 50 meter dari titik proyek.</p>
-                    </div>
-                </div>
-
-                <!-- Worker Active Tasks List -->
-                <div class="lg:col-span-2 space-y-4">
-                    <h2 class="font-bold text-white flex items-center justify-between">
-                        <span><i class="fa-solid fa-briefcase text-amber-400 mr-2"></i>Pekerjaan Lapangan Aktif</span>
-                        <span class="text-xs text-slate-400">On-Going Task</span>
-                    </h2>
-                    <div id="worker-orders-container" class="space-y-3">
-                        <!-- Loaded dynamically -->
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 3. ADMIN VIEW (ESCROW & KYC) -->
-        <div id="view-admin" class="hidden space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="bg-slate-800 border border-slate-700 p-4 rounded-2xl">
-                    <p class="text-xs text-slate-400 font-medium">Dana Escrow Tertampung (Holding)</p>
-                    <p id="admin-escrow-holding" class="text-xl font-black text-amber-400 mt-1">Rp870.000</p>
-                </div>
-                <div class="bg-slate-800 border border-slate-700 p-4 rounded-2xl">
-                    <p class="text-xs text-slate-400 font-medium">Pendapatan Komisi Platform (10%)</p>
-                    <p id="admin-platform-profit" class="text-xl font-black text-emerald-400 mt-1">Rp1.540.000</p>
-                </div>
-                <div class="bg-slate-800 border border-slate-700 p-4 rounded-2xl">
-                    <p class="text-xs text-slate-400 font-medium">Kepatuhan UU PDP (Data KTP)</p>
-                    <p class="text-xl font-black text-blue-400 mt-1"><i class="fa-solid fa-lock text-sm mr-1"></i> AES-256 Encrypted</p>
-                </div>
-            </div>
-
-            <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 space-y-4">
-                <h3 class="font-bold text-white flex items-center gap-2 border-b border-slate-700 pb-3">
-                    <i class="fa-solid fa-scale-balanced text-indigo-400"></i> Monitoring Transaksi Escrow & Penyelesaian Sengketa (Dispute Resolution)
+            <!-- Active Work Order Tasks for Worker -->
+            <div class="space-y-4">
+                <h3 class="text-base font-extrabold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-hammer text-amber-500"></i> Tugas Lapangan yang Ditugaskan
                 </h3>
-                <div id="admin-transactions-container" class="space-y-3">
-                    <!-- Loaded dynamically -->
+
+                <div id="worker-orders-feed" class="space-y-4">
+                    <!-- Populated dynamically -->
                 </div>
             </div>
-        </div>
+        </section>
+
+
+        <!-- ========================================================================= -->
+        <!-- 3. DASHBOARD ADMINISTRATOR (PENGHUBUNG & ESCROW) -->
+        <!-- ========================================================================= -->
+        <section id="role-dashboard-admin" class="hidden space-y-6">
+            <!-- Metrics Summary Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl shadow-xl">
+                    <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Dana Escrow Tertampung</p>
+                    <p id="adm-holding-sum" class="text-2xl font-black text-amber-400 mt-1">Rp870.000</p>
+                    <span class="text-[10px] text-slate-500">Dana aman di rekening penampungan</span>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl shadow-xl">
+                    <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Pendapatan Platform (10%)</p>
+                    <p id="adm-profit-sum" class="text-2xl font-black text-emerald-400 mt-1">Rp1.540.000</p>
+                    <span class="text-[10px] text-slate-500">Akumulasi sukses transaksi</span>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl shadow-xl">
+                    <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Kepatuhan UU PDP (KTP)</p>
+                    <p class="text-lg font-black text-blue-400 mt-1 flex items-center gap-1.5">
+                        <i class="fa-solid fa-lock text-sm"></i> AES-256 Valid
+                    </p>
+                    <span class="text-[10px] text-slate-500">Presigned Temporary URLs 10 Min</span>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl shadow-xl">
+                    <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Status Dispute Sengketa</p>
+                    <p class="text-lg font-black text-emerald-400 mt-1 flex items-center gap-1.5">
+                        <i class="fa-solid fa-scale-balanced text-sm"></i> 0 Tiket Aktif
+                    </p>
+                    <span class="text-[10px] text-slate-500">Semua pesanan berjalan kondusif</span>
+                </div>
+            </div>
+
+            <!-- Escrow Audit Table & Controls -->
+            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-4">
+                    <div>
+                        <h3 class="text-base font-extrabold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-receipt text-indigo-400"></i> Audit Mutasi Rekening Bersama (Escrow Transactions)
+                        </h3>
+                        <p class="text-xs text-slate-400">Pemantauan transaksi realtime, komisi platform, dan verifikasi pelepasan dana.</p>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto custom-scrollbar">
+                    <table class="w-full text-left text-xs text-slate-300">
+                        <thead class="bg-slate-950 text-slate-400 font-extrabold uppercase text-[10px] tracking-wider border-b border-slate-800">
+                            <tr>
+                                <th class="py-3 px-4">Order Code</th>
+                                <th class="py-3 px-4">Pekerjaan</th>
+                                <th class="py-3 px-4">Pihak Terlibat</th>
+                                <th class="py-3 px-4 text-right">Nilai Escrow</th>
+                                <th class="py-3 px-4 text-right">Platform Fee</th>
+                                <th class="py-3 px-4 text-right">Hak Bersih Tukang</th>
+                                <th class="py-3 px-4 text-center">Status Escrow</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-escrow-table-body" class="divide-y divide-slate-800/80">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
 
     </main>
 
-    <!-- Modal Mock Payment Gateway -->
-    <div id="modal-payment" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-slate-800 border border-slate-700 max-w-md w-full rounded-2xl p-6 space-y-4 shadow-2xl">
-            <div class="flex items-center justify-between border-b border-slate-700 pb-3">
-                <h3 class="font-bold text-white flex items-center gap-2">
-                    <i class="fa-solid fa-qrcode text-emerald-400"></i> Simulasi Payment Gateway Escrow
-                </h3>
-                <button onclick="closePaymentModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="text-center space-y-3 py-2">
-                <p class="text-xs text-slate-300">Pindai QRIS atau Bayar Virtual Account untuk menyetor dana ke penampungan Escrow:</p>
-                <div class="bg-white p-4 rounded-xl inline-block shadow">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=MIDTRANS-ESCROW-SIMULATION" class="w-36 h-36 mx-auto">
+    <!-- PAYMENT GATEWAY POPUP MODAL (MIDTRANS / XENDIT SIMULATION) -->
+    <div id="payment-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 max-w-md w-full rounded-3xl p-6 space-y-5 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-qrcode"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-extrabold text-white text-sm">Pembayaran Rekening Bersama</h4>
+                        <p class="text-[10px] text-slate-400">Payment Gateway Gateway Auto-Settlement</p>
+                    </div>
                 </div>
-                <p id="modal-pay-amount" class="text-xl font-black text-amber-400">Rp260.000</p>
-                <p id="modal-pay-ordercode" class="text-xs text-slate-400 font-mono">Order: MTK-202609-001</p>
+                <button onclick="closePayModal()" class="text-slate-400 hover:text-white p-1"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <button onclick="confirmPaymentWebhook()" class="w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold transition flex items-center justify-center gap-2">
-                <i class="fa-solid fa-check-double"></i> Simulasikan Webhook Settlement
+
+            <div class="text-center space-y-3 py-1">
+                <div class="p-4 bg-white rounded-2xl inline-block shadow-lg">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=MITRATUKANG-ESCROW-DEPOSIT" class="w-40 h-40 mx-auto">
+                </div>
+                <div>
+                    <span class="text-xs text-slate-400">Total Tagihan Escrow:</span>
+                    <p id="modal-amount-text" class="text-2xl font-black text-amber-400 mt-0.5">Rp260.000</p>
+                    <p id="modal-ordercode-text" class="text-xs font-mono text-slate-400 mt-1">MTK-202609-001</p>
+                </div>
+            </div>
+
+            <button onclick="triggerPaymentSettlement()" class="w-full py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20">
+                <i class="fa-solid fa-circle-check"></i> Simulasikan Webhook Settlement
             </button>
         </div>
     </div>
 
-    <!-- Frontend Core Script -->
+    <!-- JAVASCRIPT FRONTEND CONTROLLER -->
     <script>
-        let allOrders = [];
-        let currentPayingOrderId = null;
+        let currentOrders = [];
+        let activePayOrderId = null;
 
         function switchRole(role) {
-            document.querySelectorAll('.role-btn').forEach(btn => {
-                btn.className = 'role-btn px-4 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition flex items-center gap-1.5';
+            document.querySelectorAll('.role-nav-btn').forEach(btn => {
+                btn.className = 'role-nav-btn px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white transition flex items-center gap-2';
             });
-            document.getElementById(`btn-tab-${role}`).className = 'role-btn px-4 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-amber-500 text-slate-950 shadow';
+            document.getElementById(`btn-tab-${role}`).className = 'role-nav-btn tab-active px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2';
 
-            document.getElementById('view-client').classList.toggle('hidden', role !== 'client');
-            document.getElementById('view-worker').classList.toggle('hidden', role !== 'worker');
-            document.getElementById('view-admin').classList.toggle('hidden', role !== 'admin');
+            document.getElementById('role-dashboard-client').classList.toggle('hidden', role !== 'client');
+            document.getElementById('role-dashboard-worker').classList.toggle('hidden', role !== 'worker');
+            document.getElementById('role-dashboard-admin').classList.toggle('hidden', role !== 'admin');
         }
 
-        async function loadOrders() {
+        async function loadInitialData() {
             try {
-                const res = await fetch('/api/orders');
-                const json = await res.json();
-                if (json.success) {
-                    allOrders = json.data;
-                    renderClientOrders();
-                    renderWorkerOrders();
-                    renderAdminDashboard();
+                const [ordersRes, workersRes] = await Promise.all([
+                    fetch('/api/orders'),
+                    fetch('/api/workers/nearby?lat=-6.917500&lon=107.619150')
+                ]);
+                const ordersJson = await ordersRes.json();
+                const workersJson = await workersRes.json();
+
+                if (ordersJson.success) {
+                    currentOrders = ordersJson.data;
+                    renderClientView();
+                    renderWorkerView();
+                    renderAdminView();
+                }
+
+                if (workersJson.success) {
+                    renderNearbyWorkers(workersJson.data);
                 }
             } catch (err) {
-                console.error(err);
+                console.error("Failed loading data", err);
             }
         }
 
-        function getStatusBadge(status) {
-            const badges = {
-                'draft': '<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-slate-700 text-slate-300">Draft</span>',
-                'waiting_escrow': '<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">Menunggu Pembayaran Escrow</span>',
-                'escrow_held': '<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30">Dana Escrow Aman (Siap Dikerjakan)</span>',
-                'in_progress': '<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Sedang Dikerjakan</span>',
-                'work_submitted': '<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">Hasil Selesai (Review 24 Jam)</span>',
-                'completed': '<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Selesai & Dana Cair</span>',
-                'in_dispute': '<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">Dalam Sengketa</span>'
-            };
-            return badges[status] || `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-slate-700">${status}</span>`;
+        function renderNearbyWorkers(workers) {
+            const container = document.getElementById('nearby-workers-list');
+            container.innerHTML = workers.map(w => `
+                <div class="p-3 bg-slate-950 rounded-2xl border border-slate-800 flex items-center justify-between text-xs">
+                    <div class="flex items-center gap-2.5">
+                        <img src="${w.avatar_url}" class="w-9 h-9 rounded-xl object-cover border border-slate-700">
+                        <div>
+                            <p class="font-bold text-white">${w.full_name}</p>
+                            <p class="text-[10px] text-amber-400 capitalize">${w.category} • ⭐ ${w.rating_average}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="px-2 py-0.5 rounded bg-blue-950 text-blue-300 font-mono font-bold text-[10px]">${w.distance_km} km</span>
+                        <p class="text-[10px] text-slate-400 mt-0.5">Rp${Number(w.daily_rate).toLocaleString('id-ID')}/hari</p>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        function renderClientOrders() {
-            const container = document.getElementById('client-orders-container');
-            document.getElementById('client-order-count').innerText = `${allOrders.length} Pesanan`;
-            
-            container.innerHTML = allOrders.map(order => `
-                <div class="bg-slate-800 border border-slate-700/80 rounded-2xl p-5 space-y-3 hover:border-slate-600 transition">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        function getStatusBadgeHtml(status) {
+            const mapping = {
+                'waiting_escrow': '<span class="px-3 py-1 rounded-full text-[11px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40"><i class="fa-solid fa-hourglass-start mr-1"></i> Menunggu Pembayaran Escrow</span>',
+                'escrow_held': '<span class="px-3 py-1 rounded-full text-[11px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/40"><i class="fa-solid fa-shield-halved mr-1"></i> Escrow Terkunci (Siap Kerja)</span>',
+                'in_progress': '<span class="px-3 py-1 rounded-full text-[11px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/40"><i class="fa-solid fa-person-digging mr-1"></i> Sedang Dikerjakan</span>',
+                'work_submitted': '<span class="px-3 py-1 rounded-full text-[11px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/40"><i class="fa-solid fa-clipboard-check mr-1"></i> Selesai (Masa Review 24 Jam)</span>',
+                'completed': '<span class="px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40"><i class="fa-solid fa-circle-check mr-1"></i> Sukses & Dana Cair</span>'
+            };
+            return mapping[status] || `<span class="px-3 py-1 rounded-full text-xs font-bold bg-slate-800">${status}</span>`;
+        }
+
+        function renderClientView() {
+            const container = document.getElementById('client-orders-feed');
+            document.getElementById('client-total-badge').innerText = `${currentOrders.length} Pesanan`;
+
+            container.innerHTML = currentOrders.map(o => `
+                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4 hover:border-slate-700 transition shadow-xl">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
                         <div>
-                            <span class="text-xs font-mono text-slate-400 font-bold">${order.order_code}</span>
-                            <h3 class="font-bold text-white text-base">${order.title}</h3>
+                            <span class="text-xs font-mono font-bold text-slate-500">${o.order_code}</span>
+                            <h4 class="text-base font-extrabold text-white">${o.title}</h4>
                         </div>
-                        <div>${getStatusBadge(order.status)}</div>
+                        <div>${getStatusBadgeHtml(o.status)}</div>
                     </div>
 
-                    <p class="text-xs text-slate-300">${order.description}</p>
-                    
-                    <div class="flex flex-wrap items-center gap-4 text-xs text-slate-400 border-t border-slate-700/60 pt-3">
-                        <span><i class="fa-solid fa-user text-amber-400 mr-1"></i> Tukang: <b>${order.worker_name}</b></span>
-                        <span><i class="fa-solid fa-map-pin text-rose-400 mr-1"></i> ${order.address}</span>
-                        <span><i class="fa-solid fa-wallet text-emerald-400 mr-1"></i> Rp${Number(order.total_amount).toLocaleString('id-ID')}</span>
+                    <p class="text-xs text-slate-300 leading-relaxed">${o.description}</p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3.5 bg-slate-950 rounded-2xl border border-slate-800 text-xs text-slate-300">
+                        <div>
+                            <span class="text-slate-500 block text-[10px] font-bold uppercase">Tukang Ditugaskan</span>
+                            <span class="font-bold text-white flex items-center gap-1.5 mt-0.5">
+                                <i class="fa-solid fa-user-check text-amber-500"></i> ${o.worker_name}
+                            </span>
+                        </div>
+                        <div>
+                            <span class="text-slate-500 block text-[10px] font-bold uppercase">Lokasi Proyek</span>
+                            <span class="font-bold text-slate-200 truncate block mt-0.5">${o.address}</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-500 block text-[10px] font-bold uppercase">Total Escrow</span>
+                            <span class="font-extrabold text-emerald-400 mt-0.5 block">Rp${Number(o.total_amount).toLocaleString('id-ID')}</span>
+                        </div>
                     </div>
 
-                    <!-- Client Actions -->
-                    <div class="flex gap-2 pt-2">
-                        ${order.status === 'waiting_escrow' ? `
-                            <button onclick="openPaymentModal(${order.id}, '${order.order_code}', ${order.total_amount})" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition flex items-center gap-1.5 shadow">
-                                <i class="fa-solid fa-credit-card"></i> Bayar Escrow Sekarang
+                    <!-- Client Action Buttons -->
+                    <div class="flex flex-wrap gap-2 pt-1">
+                        ${o.status === 'waiting_escrow' ? `
+                            <button onclick="openPayModal(${o.id}, '${o.order_code}', ${o.total_amount})" class="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs transition flex items-center gap-2 shadow-lg shadow-amber-500/20">
+                                <i class="fa-solid fa-credit-card"></i> Bayar & Kunci Dana ke Escrow
                             </button>
                         ` : ''}
 
-                        ${order.status === 'work_submitted' ? `
-                            <button onclick="confirmReleaseEscrow(${order.id})" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition flex items-center gap-1.5 shadow">
-                                <i class="fa-solid fa-circle-check"></i> Konfirmasi Selesai & Lepas Dana
+                        ${o.status === 'work_submitted' ? `
+                            <button onclick="confirmReleaseEscrow(${o.id})" class="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs transition flex items-center gap-2 shadow-lg shadow-emerald-500/20">
+                                <i class="fa-solid fa-circle-check"></i> Konfirmasi Selesai & Cairkan Dana
                             </button>
                         ` : ''}
                     </div>
@@ -322,40 +494,41 @@
             `).join('');
         }
 
-        function renderWorkerOrders() {
-            const container = document.getElementById('worker-orders-container');
-            container.innerHTML = allOrders.map(order => `
-                <div class="bg-slate-800 border border-slate-700/80 rounded-2xl p-5 space-y-3">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        function renderWorkerView() {
+            const container = document.getElementById('worker-orders-feed');
+            container.innerHTML = currentOrders.map(o => `
+                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-xl">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
                         <div>
-                            <span class="text-xs font-mono text-slate-400 font-bold">${order.order_code}</span>
-                            <h3 class="font-bold text-white text-base">${order.title}</h3>
+                            <span class="text-xs font-mono font-bold text-slate-500">${o.order_code}</span>
+                            <h4 class="text-base font-extrabold text-white">${o.title}</h4>
                         </div>
-                        <div>${getStatusBadge(order.status)}</div>
+                        <div>${getStatusBadgeHtml(o.status)}</div>
                     </div>
 
-                    <div class="p-3 bg-slate-950 rounded-xl text-xs space-y-1">
-                        <p class="text-slate-400">Upah Bersih Anda: <b class="text-emerald-400 font-bold">Rp${Number(order.base_price * 0.9).toLocaleString('id-ID')}</b> (Potongan Platform 10%)</p>
-                        <p class="text-slate-400">Lokasi Proyek: <span class="text-slate-200">${order.address}</span></p>
+                    <div class="p-3.5 bg-slate-950 rounded-2xl border border-slate-800 text-xs space-y-1">
+                        <p class="text-slate-400">Pemberi Kerja: <b class="text-white">${o.employer_name}</b></p>
+                        <p class="text-slate-400">Alamat Kerja: <span class="text-slate-200">${o.address}</span></p>
+                        <p class="text-slate-400">Upah Bersih Anda: <b class="text-emerald-400 font-extrabold">Rp${Number(o.base_price * 0.9).toLocaleString('id-ID')}</b> (Potongan platform 10%)</p>
                     </div>
 
-                    <!-- Worker Actions -->
-                    <div class="flex flex-wrap gap-2 pt-2">
-                        ${order.status === 'escrow_held' ? `
-                            <button onclick="handleStartWork(${order.id})" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition flex items-center gap-1.5 shadow">
-                                <i class="fa-solid fa-location-crosshairs"></i> Validasi Geofence & Mulai Kerja
+                    <!-- Worker Flow Buttons -->
+                    <div class="flex flex-wrap gap-2 pt-1">
+                        ${o.status === 'escrow_held' ? `
+                            <button onclick="handleStartWork(${o.id})" class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-xs transition flex items-center gap-2 shadow-lg shadow-blue-600/25">
+                                <i class="fa-solid fa-location-crosshairs"></i> Validasi Geofence GPS & Mulai Kerja
                             </button>
                         ` : ''}
 
-                        ${order.status === 'in_progress' ? `
-                            <button onclick="handleSubmitWork(${order.id})" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition flex items-center gap-1.5 shadow">
-                                <i class="fa-solid fa-camera"></i> Unggah 2 Foto Bukti & Selesaikan
+                        ${o.status === 'in_progress' ? `
+                            <button onclick="handleSubmitWork(${o.id})" class="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-extrabold text-xs transition flex items-center gap-2 shadow-lg shadow-purple-600/25">
+                                <i class="fa-solid fa-camera"></i> Unggah 2 Foto Bukti & Submit Selesai
                             </button>
                         ` : ''}
 
-                        ${order.status === 'work_submitted' ? `
-                            <span class="text-xs text-purple-300 font-semibold flex items-center gap-1">
-                                <i class="fa-solid fa-hourglass-half"></i> Menunggu konfirmasi klien / Auto-release dalam 24 jam.
+                        ${o.status === 'work_submitted' ? `
+                            <span class="text-xs text-purple-300 font-semibold flex items-center gap-1.5 py-1">
+                                <i class="fa-solid fa-hourglass-half animate-spin"></i> Menunggu review klien atau auto-release otomatis 24 jam.
                             </span>
                         ` : ''}
                     </div>
@@ -363,28 +536,34 @@
             `).join('');
         }
 
-        function renderAdminDashboard() {
-            const container = document.getElementById('admin-transactions-container');
-            container.innerHTML = allOrders.map(order => `
-                <div class="flex items-center justify-between p-3.5 bg-slate-900 rounded-xl border border-slate-700/80 text-xs">
-                    <div>
-                        <span class="font-mono text-slate-400">${order.order_code}</span> - <b class="text-white">${order.title}</b>
-                        <p class="text-slate-400 text-[11px]">Klien: ${order.employer_name} | Tukang: ${order.worker_name}</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="font-bold text-amber-400">Total: Rp${Number(order.total_amount).toLocaleString('id-ID')}</p>
-                        <div>${getStatusBadge(order.status)}</div>
-                    </div>
-                </div>
+        function renderAdminView() {
+            const tbody = document.getElementById('admin-escrow-table-body');
+            tbody.innerHTML = currentOrders.map(o => `
+                <tr class="hover:bg-slate-950/40 transition">
+                    <td class="py-3.5 px-4 font-mono font-bold text-slate-400">${o.order_code}</td>
+                    <td class="py-3.5 px-4 font-bold text-white">${o.title}</td>
+                    <td class="py-3.5 px-4 text-slate-300">${o.employer_name} ➔ ${o.worker_name}</td>
+                    <td class="py-3.5 px-4 text-right font-extrabold text-amber-400">Rp${Number(o.total_amount).toLocaleString('id-ID')}</td>
+                    <td class="py-3.5 px-4 text-right font-bold text-slate-400">Rp${Number(o.escrow ? o.escrow.platform_cut : o.base_price * 0.1).toLocaleString('id-ID')}</td>
+                    <td class="py-3.5 px-4 text-right font-extrabold text-emerald-400">Rp${Number(o.escrow ? o.escrow.worker_net_income : o.base_price * 0.9).toLocaleString('id-ID')}</td>
+                    <td class="py-3.5 px-4 text-center">${getStatusBadgeHtml(o.status)}</td>
+                </tr>
             `).join('');
         }
 
-        async function handleCreateOrder(e) {
+        function calcEscrowEstimate() {
+            const base = parseFloat(document.getElementById('form-order-price').value) || 0;
+            const fee = 10000;
+            document.getElementById('txt-calc-base').innerText = `Rp${base.toLocaleString('id-ID')}`;
+            document.getElementById('txt-calc-total').innerText = `Rp${(base + fee).toLocaleString('id-ID')}`;
+        }
+
+        async function submitNewOrder(e) {
             e.preventDefault();
-            const title = document.getElementById('order-title').value;
-            const address = document.getElementById('order-address').value;
-            const base_price = document.getElementById('order-base-price').value;
-            const job_type = document.getElementById('order-job-type').value;
+            const title = document.getElementById('form-order-title').value;
+            const job_type = document.getElementById('form-order-jobtype').value;
+            const base_price = document.getElementById('form-order-price').value;
+            const address = document.getElementById('form-order-address').value;
 
             const res = await fetch('/api/orders', {
                 method: 'POST',
@@ -393,48 +572,45 @@
                     employer_id: 1,
                     worker_id: 2,
                     title,
-                    description: `Pekerjaan konstruksi di ${address}`,
+                    description: `Pekerjaan perbaikan di ${address}`,
                     job_type,
                     address,
-                    latitude: -6.917500,
-                    longitude: 107.619150,
                     base_price
                 })
             });
             const json = await res.json();
             alert(json.message);
-            loadOrders();
+            loadInitialData();
         }
 
-        function openPaymentModal(orderId, orderCode, totalAmount) {
-            currentPayingOrderId = orderId;
-            document.getElementById('modal-pay-amount').innerText = `Rp${Number(totalAmount).toLocaleString('id-ID')}`;
-            document.getElementById('modal-pay-ordercode').innerText = `Order: ${orderCode}`;
-            document.getElementById('modal-payment').classList.remove('hidden');
+        function openPayModal(orderId, code, amount) {
+            activePayOrderId = orderId;
+            document.getElementById('modal-amount-text').innerText = `Rp${Number(amount).toLocaleString('id-ID')}`;
+            document.getElementById('modal-ordercode-text').innerText = `Order: ${code}`;
+            document.getElementById('payment-modal').classList.remove('hidden');
         }
 
-        function closePaymentModal() {
-            document.getElementById('modal-payment').classList.add('hidden');
+        function closePayModal() {
+            document.getElementById('payment-modal').classList.add('hidden');
         }
 
-        async function confirmPaymentWebhook() {
+        async function triggerPaymentSettlement() {
             const res = await fetch('/api/payment/webhook', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    order_id: currentPayingOrderId,
+                    order_id: activePayOrderId,
                     transaction_status: 'settlement',
-                    transaction_id: `MIDTRANS-SETTLE-${Date.now()}`
+                    transaction_id: `MIDTRANS-${Date.now()}`
                 })
             });
             const json = await res.json();
             alert(json.message);
-            closePaymentModal();
-            loadOrders();
+            closePayModal();
+            loadInitialData();
         }
 
         async function handleStartWork(orderId) {
-            // Simulasi koordinat GPS tukang di lokasi proyek (-6.917500, 107.619150)
             const res = await fetch(`/api/orders/${orderId}/start-work`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -445,7 +621,7 @@
             });
             const json = await res.json();
             alert(json.message);
-            loadOrders();
+            loadInitialData();
         }
 
         async function handleSubmitWork(orderId) {
@@ -457,22 +633,22 @@
                         'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=400',
                         'https://images.unsplash.com/photo-1507652313519-d4e9174996dd?w=400'
                     ],
-                    notes: 'Pekerjaan perbaikan selesai dengan rapi dan telah diuji.'
+                    notes: 'Pekerjaan selesai 100% dan terpasang rapi.'
                 })
             });
             const json = await res.json();
             alert(json.message);
-            loadOrders();
+            loadInitialData();
         }
 
         async function confirmReleaseEscrow(orderId) {
-            if (!confirm('Apakah Anda yakin pekerjaan sudah sesuai dan ingin mencairkan dana ke tukang?')) return;
+            if (!confirm('Apakah hasil pekerjaan sudah diperiksa dan disetujui? Dana akan ditransfer ke saldo dompet tukang.')) return;
             const res = await fetch(`/api/orders/${orderId}/release-escrow`, {
                 method: 'POST'
             });
             const json = await res.json();
             alert(json.message);
-            loadOrders();
+            loadInitialData();
         }
 
         async function triggerCronJob() {
@@ -481,11 +657,11 @@
             });
             const json = await res.json();
             alert(json.message);
-            loadOrders();
+            loadInitialData();
         }
 
-        // Initial Load
-        loadOrders();
+        // Initialize on load
+        loadInitialData();
     </script>
 </body>
 </html>

@@ -42,6 +42,10 @@ app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
+app.get('/profile', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'profile.html'));
+});
+
 // API Routes
 app.use('/api', apiRoutes);
 
@@ -88,6 +92,7 @@ app.listen(PORT, '0.0.0.0', async () => {
     console.log(`=======================================================`);
     console.log(`🏗️  MitraTukang Enterprise - Production Server Active`);
     console.log(`📊 Dashboard Terpadu: http://0.0.0.0:${PORT}/`);
+    console.log(`👤 Halaman Profil:    http://0.0.0.0:${PORT}/profile`);
     console.log(`🌐 Landing Page:     http://0.0.0.0:${PORT}/landing`);
     console.log(`📝 Register:         http://0.0.0.0:${PORT}/register`);
     console.log(`🚀 Portal Login:     http://0.0.0.0:${PORT}/login`);

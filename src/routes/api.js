@@ -85,7 +85,7 @@ router.get('/services', (req, res) => {
 });
 
 // -------------------------------------------------------------
-// 0. AUTH REGISTER & LOGIN
+// 0. AUTH REGISTER, LOGIN & PROFILE
 // -------------------------------------------------------------
 router.post('/auth/register', async (req, res) => {
     const connection = await pool.getConnection();
@@ -199,6 +199,77 @@ router.post('/auth/login', async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ success: false, message: 'Auth server error', error: err.message });
+    }
+});
+
+// GET USER PROFILE
+router.get('/auth/profile/:id', async (req, res) => {
+    try {
+        const userId = parseInt(req.params.id);
+        const [users] = await pool.query(`
+            SELECT u.id, u.phone_number, u.email, u.full_name, u.avatar_url, u.role, u.kyc_status, u.wallet_balance, u.created_at,
+                   wp.category, wp.experience_years, wp.daily_rate, wp.hourly_rate, wp.rating_average, wp.rating_count,
+                   k.id_card_number_encrypted
+            FROM users u
+            LEFT JOIN worker_profiles wp ON wp.user_id = u.id
+            LEFT JOIN kyc_verifications k ON k.user_id = u.id
+            WHERE u.id = ?
+        `, [userId]);
+
+        if (users.length === 0) {
+            return res.status(404).json({ success: false, message: 'User tidak ditemukan' });
+        }
+
+        const user = users[0];
+        let decryptedNik = null;
+        if (user.id_card_number_encrypted) {
+            decryptedNik = decryptData(user.id_card_number_encrypted);
+        }
+
+        res.json({
+            success: true,
+            data: {
+                ...user,
+                nik: decryptedNik ? decryptedNik.replace(/(\d{6})\d{6}(\d{4})/, '$1******$2') : '3204********0001',
+                full_nik_masked: decryptedNik ? decryptedNik.replace(/\d(?=\d{4})/g, "*") : '************0001'
+            }
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Get profile failed', error: err.message });
+    }
+});
+
+// UPDATE USER PROFILE
+router.put('/auth/profile/:id', async (req, res) => {
+    try {
+        const userId = parseInt(req.params.id);
+        const { full_name, email, phone_number, category, daily_rate, avatar_url } = req.body;
+
+        await pool.query(`
+            UPDATE users 
+            SET full_name = ?, email = ?, phone_number = ?, avatar_url = IFNULL(?, avatar_url)
+            WHERE id = ?
+        `, [full_name, email, phone_number, avatar_url || null, userId]);
+
+        if (category || daily_rate) {
+            await pool.query(`
+                UPDATE worker_profiles
+                SET category = IFNULL(?, category), daily_rate = IFNULL(?, daily_rate)
+                WHERE user_id = ?
+            `, [category || null, daily_rate ? parseFloat(daily_rate) : null, userId]);
+        }
+
+        const [updated] = await pool.query('SELECT id, phone_number, email, full_name, avatar_url, role, kyc_status, wallet_balance FROM users WHERE id = ?', [userId]);
+
+        res.json({
+            success: true,
+            message: 'Profil berhasil diperbarui di database!',
+            data: updated[0]
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Update profile failed', error: err.message });
     }
 });
 
@@ -608,7 +679,6 @@ router.post('/wallet/withdraw', async (req, res) => {
             return res.status(400).json({ success: false, message: 'Saldo dompet tidak mencukupi untuk penarikan ini.' });
         }
 
-        // Kurangi saldo & simpan tiket penarikan
         await connection.query('UPDATE users SET wallet_balance = wallet_balance - ? WHERE id = ?', [withdrawAmount, user_id]);
 
         await connection.query(`

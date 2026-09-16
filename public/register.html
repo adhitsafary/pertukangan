@@ -77,19 +77,25 @@
             <!-- Nama Lengkap -->
             <div>
                 <label class="block text-slate-700 dark:text-slate-300 font-bold mb-1">Nama Lengkap (Sesuai KTP)</label>
-                <input type="text" id="reg-name" required placeholder="Cth: Budi Santoso" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500">
+                <input type="text" id="reg-name" required placeholder="Cth: Adit Sapari" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500">
             </div>
 
-            <!-- Nomor HP / WhatsApp -->
+            <!-- Nomor HP / WhatsApp & Email -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                     <label class="block text-slate-700 dark:text-slate-300 font-bold mb-1">No. WhatsApp (OTP)</label>
-                    <input type="tel" id="reg-phone" required placeholder="081234567890" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500">
+                    <input type="tel" id="reg-phone" required placeholder="082123852983" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500">
                 </div>
                 <div>
-                    <label class="block text-slate-700 dark:text-slate-300 font-bold mb-1">Email (Opsional)</label>
-                    <input type="email" id="reg-email" placeholder="budi@gmail.com" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500">
+                    <label class="block text-slate-700 dark:text-slate-300 font-bold mb-1">Email</label>
+                    <input type="email" id="reg-email" placeholder="adhitsafary@gmail.com" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500">
                 </div>
+            </div>
+
+            <!-- Password -->
+            <div>
+                <label class="block text-slate-700 dark:text-slate-300 font-bold mb-1">Password</label>
+                <input type="password" id="reg-password" required value="123456" placeholder="Buat password akun" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500">
             </div>
 
             <!-- NIK KTP (Enkripsi UU PDP) -->
@@ -125,8 +131,8 @@
                 </div>
             </div>
 
-            <button type="submit" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/20 transition">
-                <i class="fa-solid fa-check mr-1"></i> Buat Akun & Verifikasi Data
+            <button type="submit" id="btn-submit-reg" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/20 transition">
+                <i class="fa-solid fa-check mr-1"></i> Buat Akun & Simpan ke Database
             </button>
         </form>
 
@@ -167,15 +173,57 @@
 
         async function handleRegister(e) {
             e.preventDefault();
+            const btn = document.getElementById('btn-submit-reg');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Mendaftarkan ke MySQL...';
+
             const role = document.querySelector('input[name="role"]:checked').value;
-            const full_name = document.getElementById('reg-name').value;
+            const full_name = document.getElementById('reg-name').value.trim();
+            const phone_number = document.getElementById('reg-phone').value.trim();
+            const email = document.getElementById('reg-email').value.trim();
+            const password = document.getElementById('reg-password').value.trim();
+            const nik = document.getElementById('reg-nik').value.trim();
+            const category = document.getElementById('reg-category')?.value;
+            const daily_rate = document.getElementById('reg-daily-rate')?.value;
 
-            alert(`✅ Pendaftaran Berhasil!\nSelamat datang, ${full_name}.\nData NIK KTP Anda telah diamankan dengan enkripsi AES-256 (Kepatuhan UU PDP).\n\nAnda akan dialihkan ke dashboard.`);
+            try {
+                const res = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        full_name,
+                        phone_number,
+                        email,
+                        password,
+                        role,
+                        nik,
+                        category,
+                        daily_rate
+                    })
+                });
 
-            if (role === 'employer') {
-                window.location.href = '/warga';
-            } else {
-                window.location.href = '/tukang';
+                const json = await res.json();
+
+                if (json.success) {
+                    // Simpan data user aktif di session storage
+                    localStorage.setItem('mitratukang_user', JSON.stringify(json.data));
+                    alert(`✅ Pendaftaran Berhasil!\nSelamat datang, ${json.data.full_name}.\nData Anda sudah tersimpan di database MySQL & NIK dienkripsi AES-256.\n\nMengalihkan ke portal Anda...`);
+
+                    if (role === 'employer') {
+                        window.location.href = '/warga';
+                    } else {
+                        window.location.href = '/tukang';
+                    }
+                } else {
+                    alert(`❌ Gagal Mendaftar: ${json.message}`);
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fa-solid fa-check mr-1"></i> Buat Akun & Simpan ke Database';
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Terjadi kesalahan koneksi saat mendaftarkan akun.');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-check mr-1"></i> Buat Akun & Simpan ke Database';
             }
         }
     </script>

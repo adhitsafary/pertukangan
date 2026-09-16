@@ -5,6 +5,91 @@ const { validateGeofence, calculateHaversineDistance } = require('../services/sp
 const { encryptData, decryptData, generatePresignedUrl } = require('../services/encryptionService');
 
 // -------------------------------------------------------------
+// 0. AUTH REGISTER ENDPOINT (SIMPAN KE MYSQL & ENKRIPSI KTP)
+// -------------------------------------------------------------
+router.post('/auth/register', async (req, res) => {
+    const connection = await pool.getConnection();
+    await connection.beginTransaction();
+
+    try {
+        const { full_name, phone_number, email, role, nik, category, daily_rate, password } = req.body;
+
+        if (!full_name || !phone_number) {
+            await connection.rollback();
+            connection.release();
+            return res.status(400).json({ success: false, message: 'Nama lengkap dan nomor handphone wajib diisi.' });
+        }
+
+        // Cek duplikasi nomor HP atau email
+        const [existing] = await connection.query(`
+            SELECT id FROM users WHERE phone_number = ? OR (email = ? AND email IS NOT NULL AND email != '')
+        `, [phone_number, email || '']);
+
+        if (existing.length > 0) {
+            await connection.rollback();
+            connection.release();
+            return res.status(409).json({ success: false, message: 'Nomor WhatsApp atau Email sudah terdaftar di sistem.' });
+        }
+
+        const avatar = role === 'worker' 
+            ? 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150' 
+            : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150';
+
+        const userPass = password || '123456';
+
+        // 1. Insert User ke MySQL
+        const [userResult] = await connection.query(`
+            INSERT INTO users (phone_number, email, password, full_name, avatar_url, role, kyc_status, wallet_balance)
+            VALUES (?, ?, ?, ?, ?, ?, 'verified', 0.00)
+        `, [phone_number, email || null, userPass, full_name, avatar, role || 'employer']);
+
+        const newUserId = userResult.insertId;
+
+        // 2. Insert KYC jika ada NIK (Enkripsi AES-256 UU PDP)
+        if (nik) {
+            const encryptedNik = encryptData(nik);
+            await connection.query(`
+                INSERT INTO kyc_verifications (user_id, id_card_number_encrypted, id_card_photo_path, selfie_photo_path, verified_at)
+                VALUES (?, ?, '/uploads/kyc/default_ktp.jpg', '/uploads/kyc/default_selfie.jpg', NOW())
+            `, [newUserId, encryptedNik]);
+        }
+
+        // 3. Jika role worker, buat profil tukang
+        if (role === 'worker') {
+            await connection.query(`
+                INSERT INTO worker_profiles (user_id, category, experience_years, hourly_rate, daily_rate, current_latitude, current_longitude, is_available, rating_average, rating_count)
+                VALUES (?, ?, 3, ?, ?, -6.917500, 107.619150, 1, 5.0, 1)
+            `, [newUserId, category || 'batu', Math.round((parseFloat(daily_rate) || 200000) / 7), parseFloat(daily_rate) || 200000]);
+        }
+
+        await connection.commit();
+        connection.release();
+
+        const newUser = {
+            id: newUserId,
+            phone_number,
+            email: email || null,
+            full_name,
+            avatar_url: avatar,
+            role: role || 'employer',
+            kyc_status: 'verified',
+            wallet_balance: 0.00
+        };
+
+        res.json({
+            success: true,
+            message: 'Pendaftaran berhasil! Data Anda tersimpan aman di database MySQL.',
+            data: newUser
+        });
+    } catch (err) {
+        await connection.rollback();
+        connection.release();
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Gagal mendaftarkan akun', error: err.message });
+    }
+});
+
+// -------------------------------------------------------------
 // 0. AUTH LOGIN ENDPOINT (VERIFIKASI EMAIL/PHONE & PASSWORD)
 // -------------------------------------------------------------
 router.post('/auth/login', async (req, res) => {
@@ -27,12 +112,10 @@ router.post('/auth/login', async (req, res) => {
 
         const user = users[0];
 
-        // Validasi password (default demo '123456' atau password di DB)
         if (user.password && user.password !== password) {
             return res.status(401).json({ success: false, message: 'Password salah. Silakan coba lagi.' });
         }
 
-        // Hapus field password dari response
         delete user.password;
 
         res.json({
@@ -51,7 +134,9 @@ router.post('/auth/login', async (req, res) => {
 // -------------------------------------------------------------
 router.get('/orders', async (req, res) => {
     try {
-        const query = `
+        const { employer_id, worker_id } = req.query;
+
+        let query = `
             SELECT 
                 o.*,
                 u_emp.full_name AS employer_name,
@@ -65,9 +150,23 @@ router.get('/orders', async (req, res) => {
             LEFT JOIN users u_emp ON o.employer_id = u_emp.id
             LEFT JOIN users u_wrk ON o.worker_id = u_wrk.id
             LEFT JOIN escrow_transactions e ON e.order_id = o.id
-            ORDER BY o.created_at DESC
+            WHERE 1=1
         `;
-        const [rows] = await pool.query(query);
+        const params = [];
+
+        if (employer_id) {
+            query += ` AND o.employer_id = ?`;
+            params.push(parseInt(employer_id));
+        }
+
+        if (worker_id) {
+            query += ` AND o.worker_id = ?`;
+            params.push(parseInt(worker_id));
+        }
+
+        query += ` ORDER BY o.created_at DESC`;
+
+        const [rows] = await pool.query(query, params);
 
         const formatted = rows.map(r => ({
             id: r.id,

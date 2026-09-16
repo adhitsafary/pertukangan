@@ -11,7 +11,7 @@
         }
     </script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
     </style>
@@ -29,12 +29,14 @@
     <header class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50 transition-colors duration-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
             <div class="flex items-center gap-3.5">
-                <div class="w-11 h-11 rounded-2xl bg-amber-500 flex items-center justify-center text-slate-950 text-xl font-black shadow-lg shadow-amber-500/20">
-                    <i class="fa-solid fa-house-user"></i>
-                </div>
+                <a href="/">
+                    <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-amber-600 to-amber-400 flex items-center justify-center text-slate-950 text-xl font-black shadow-lg shadow-amber-500/20">
+                        <i class="fa-solid fa-house-user"></i>
+                    </div>
+                </a>
                 <div>
                     <h1 class="text-lg font-extrabold text-slate-900 dark:text-white">Portal Warga / Pencari Tukang</h1>
-                    <p class="text-xs text-slate-500 dark:text-slate-400">User: <b id="header-user-name" class="text-amber-600 dark:text-amber-400">Budi Santoso (Klien)</b></p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">User: <b id="header-user-name" class="text-amber-600 dark:text-amber-400">Memuat...</b></p>
                 </div>
             </div>
 
@@ -50,46 +52,67 @@
     </header>
 
     <!-- Main Content -->
-    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-8">
         
-        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-amber-50 via-amber-100/40 to-slate-100 dark:from-slate-900 dark:via-amber-950/40 dark:to-slate-900 border border-amber-200 dark:border-slate-800 p-6 shadow-sm dark:shadow-xl flex items-center justify-between transition-colors duration-200">
-            <div>
-                <span class="px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/30 inline-flex items-center gap-1.5 mb-2">
-                    <i class="fa-solid fa-shield-halved text-emerald-600 dark:text-emerald-400"></i> Rekber Escrow Aktif
+        <!-- Welcome Banner with Guarantee Badge (Kanggo style) -->
+        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-amber-500 via-amber-600 to-yellow-500 p-6 md:p-8 text-slate-950 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div class="space-y-2 max-w-2xl">
+                <span class="px-3 py-1 rounded-full text-xs font-black bg-slate-950 text-amber-400 inline-flex items-center gap-1.5 shadow-sm">
+                    <i class="fa-solid fa-shield-halved text-emerald-400"></i> Garansi Pekerjaan Resmi 14 Hari
                 </span>
-                <h2 class="text-2xl font-black text-slate-900 dark:text-white">Selamat Datang, <span id="welcome-user-name">Warga</span></h2>
-                <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">Pesan tukang terpercaya dan dana Anda aman 100% sampai pekerjaan tuntas disetujui.</p>
+                <h2 class="text-2xl sm:text-3xl font-black tracking-tight">Selamat Datang, <span id="welcome-user-name">Warga</span>!</h2>
+                <p class="text-xs sm:text-sm font-semibold text-slate-950/80 leading-relaxed">Pilih layanan perbaikan bangunan rumah Anda di bawah. Biaya ditampung di sistem Rekber Escrow sampai pekerjaan tuntas teruji.</p>
             </div>
+            <a href="#katalog-layanan" class="px-6 py-3.5 rounded-2xl bg-slate-950 text-white font-extrabold text-xs shadow-2xl hover:bg-slate-900 transition flex items-center gap-2 self-start md:self-auto">
+                <i class="fa-solid fa-list-check text-amber-400"></i> Pilih Katalog Layanan
+            </a>
         </div>
 
+        <!-- 1. KATALOG LAYANAN SPESIALIS (KANGGO STYLE GRID) -->
+        <section id="katalog-layanan" class="space-y-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
+                        <i class="fa-solid fa-layer-group text-amber-500"></i> Katalog Layanan Tukang Siap Panggil
+                    </h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Klik layanan untuk mengisi form order otomatis dengan estimasi standar.</p>
+                </div>
+            </div>
+
+            <div id="service-catalog-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
+                <!-- Loaded Dynamically -->
+            </div>
+        </section>
+
+        <!-- 2. PEMESANAN & RADAR GPS -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             
             <!-- Left: Form Pemesanan & Radar Tukang -->
-            <div class="lg:col-span-4 space-y-6">
+            <div class="lg:col-span-5 space-y-6">
                 <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-md dark:shadow-xl space-y-4 transition-colors duration-200">
                     <h3 class="font-extrabold text-slate-900 dark:text-white text-sm flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
-                        <i class="fa-solid fa-file-circle-plus text-amber-500"></i> Buat Permintaan Tukang
+                        <i class="fa-solid fa-file-circle-plus text-amber-500"></i> Form Permintaan Jasa Tukang
                     </h3>
                     <form onsubmit="submitNewOrder(event)" class="space-y-3.5 text-xs">
                         <div>
                             <label class="block text-slate-700 dark:text-slate-300 font-bold mb-1">Judul Pekerjaan</label>
-                            <input type="text" id="form-order-title" required placeholder="Cth: Pasang Keramik Teras Depan" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500">
+                            <input type="text" id="form-order-title" required placeholder="Cth: Perbaikan Pipa Bocor di Dapur" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500">
                         </div>
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="block text-slate-700 dark:text-slate-300 font-bold mb-1">Kategori</label>
-                                <select id="form-order-cat" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500">
-                                    <option value="batu">Tukang Batu & Keramik</option>
-                                    <option value="kayu">Tukang Kayu</option>
+                                <label class="block text-slate-700 dark:text-slate-300 font-bold mb-1">Kategori Spesialis</label>
+                                <select id="form-order-cat" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500">
                                     <option value="pipa">Tukang Pipa / Saluran</option>
+                                    <option value="batu">Tukang Batu & Keramik</option>
+                                    <option value="kayu">Tukang Kayu & Plafon</option>
                                     <option value="listrik">Tukang Listrik</option>
                                     <option value="cat">Tukang Cat</option>
-                                    <option value="las">Tukang Las</option>
+                                    <option value="las">Tukang Las & Kanopi</option>
                                 </select>
                             </div>
                             <div>
                                 <label class="block text-slate-700 dark:text-slate-300 font-bold mb-1">Sistem Upah</label>
-                                <select id="form-order-jobtype" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500">
+                                <select id="form-order-jobtype" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500">
                                     <option value="daily">Harian</option>
                                     <option value="project_based">Borongan</option>
                                 </select>
@@ -97,7 +120,7 @@
                         </div>
                         <div>
                             <label class="block text-slate-700 dark:text-slate-300 font-bold mb-1">Estimasi Upah (Rp)</label>
-                            <input type="number" id="form-order-price" required value="250000" oninput="calcEscrowEstimate()" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white font-bold focus:outline-none focus:border-amber-500">
+                            <input type="number" id="form-order-price" required value="150000" oninput="calcEscrowEstimate()" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white font-bold focus:outline-none focus:border-amber-500">
                         </div>
                         <div>
                             <label class="block text-slate-700 dark:text-slate-300 font-bold mb-1">Alamat Proyek</label>
@@ -106,37 +129,38 @@
                         <div class="p-3 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-1">
                             <div class="flex justify-between text-slate-500 dark:text-slate-400">
                                 <span>Upah Jasa:</span>
-                                <span id="txt-calc-base" class="text-slate-900 dark:text-white font-semibold">Rp250.000</span>
+                                <span id="txt-calc-base" class="text-slate-900 dark:text-white font-semibold">Rp150.000</span>
                             </div>
                             <div class="flex justify-between text-slate-500 dark:text-slate-400">
-                                <span>Platform Fee:</span>
+                                <span>Biaya Layanan & Asuransi:</span>
                                 <span class="text-slate-900 dark:text-white font-semibold">Rp10.000</span>
                             </div>
                             <div class="border-t border-slate-200 dark:border-slate-800 pt-1 flex justify-between font-extrabold text-amber-600 dark:text-amber-400 text-sm">
-                                <span>Total Escrow:</span>
-                                <span id="txt-calc-total">Rp260.000</span>
+                                <span>Total Escrow Deposit:</span>
+                                <span id="txt-calc-total">Rp160.000</span>
                             </div>
                         </div>
-                        <button type="submit" class="w-full py-3 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs shadow-lg shadow-amber-500/20 transition">
-                            <i class="fa-solid fa-paper-plane mr-1"></i> Pesan & Buka Rekber Escrow
+                        <button type="submit" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/20 transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-paper-plane"></i> Pesan & Kunci Rekber Escrow
                         </button>
                     </form>
                 </div>
 
+                <!-- Radar Tukang Terdekat -->
                 <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-md dark:shadow-xl space-y-4 transition-colors duration-200">
                     <h3 class="font-extrabold text-slate-900 dark:text-white text-sm flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-                        <span class="flex items-center gap-2"><i class="fa-solid fa-compass text-blue-500"></i> Tukang di Sekitar Anda</span>
+                        <span class="flex items-center gap-2"><i class="fa-solid fa-compass text-blue-500"></i> Radar Tukang Terdekat</span>
                         <span class="text-[10px] bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 px-2 py-0.5 rounded font-mono">Haversine GPS</span>
                     </h3>
                     <div id="nearby-workers-list" class="space-y-3"></div>
                 </div>
             </div>
 
-            <!-- Right: Daftar Pesanan Saya -->
-            <div class="lg:col-span-8 space-y-4">
+            <!-- Right: Daftar Pesanan Saya (With Photo Review & Warranty) -->
+            <div class="lg:col-span-7 space-y-4">
                 <div class="flex items-center justify-between">
                     <h3 class="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-                        <i class="fa-solid fa-list-check text-amber-500"></i> Daftar Pesanan Jasa Anda
+                        <i class="fa-solid fa-list-check text-amber-500"></i> Monitoring & Riwayat Pesanan Anda
                     </h3>
                     <span id="client-total-badge" class="text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-3 py-1 rounded-full text-slate-500 dark:text-slate-400 font-bold">Memuat...</span>
                 </div>
@@ -162,13 +186,44 @@
                 </div>
                 <div>
                     <span class="text-xs text-slate-500 dark:text-slate-400">Total Tagihan Escrow:</span>
-                    <p id="modal-amount-text" class="text-2xl font-black text-amber-600 dark:text-amber-400 mt-0.5">Rp260.000</p>
+                    <p id="modal-amount-text" class="text-2xl font-black text-amber-600 dark:text-amber-400 mt-0.5">Rp160.000</p>
                     <p id="modal-ordercode-text" class="text-xs font-mono text-slate-400 mt-1">MTK-202609-001</p>
                 </div>
             </div>
             <button onclick="triggerPaymentSettlement()" class="w-full py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20">
                 <i class="fa-solid fa-circle-check"></i> Simulasikan Webhook Settlement
             </button>
+        </div>
+    </div>
+
+    <!-- Rating Modal -->
+    <div id="review-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 max-w-md w-full rounded-3xl p-6 space-y-4 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                <h4 class="font-extrabold text-slate-900 dark:text-white text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-star text-amber-400"></i> Beri Ulasan & Bintang Tukang
+                </h4>
+                <button onclick="closeReviewModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-slate-700 dark:text-slate-300 font-bold mb-1">Rating Kualitas Kerja (1-5)</label>
+                    <div class="flex gap-2">
+                        <button type="button" onclick="setRating(1)" class="star-btn text-2xl text-slate-300 dark:text-slate-700 hover:text-amber-400"><i class="fa-solid fa-star"></i></button>
+                        <button type="button" onclick="setRating(2)" class="star-btn text-2xl text-slate-300 dark:text-slate-700 hover:text-amber-400"><i class="fa-solid fa-star"></i></button>
+                        <button type="button" onclick="setRating(3)" class="star-btn text-2xl text-slate-300 dark:text-slate-700 hover:text-amber-400"><i class="fa-solid fa-star"></i></button>
+                        <button type="button" onclick="setRating(4)" class="star-btn text-2xl text-slate-300 dark:text-slate-700 hover:text-amber-400"><i class="fa-solid fa-star"></i></button>
+                        <button type="button" onclick="setRating(5)" class="star-btn text-2xl text-amber-400"><i class="fa-solid fa-star"></i></button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-slate-700 dark:text-slate-300 font-bold mb-1">Komentar Ulasan</label>
+                    <textarea id="review-comment-input" rows="3" placeholder="Pekerjaan sangat rapi dan cepat selesai!" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500"></textarea>
+                </div>
+                <button onclick="submitReview()" class="w-full py-3 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs transition">
+                    Kirim Ulasan Bintang
+                </button>
+            </div>
         </div>
     </div>
 
@@ -187,7 +242,6 @@
         }
         updateThemeIcons();
 
-        // Get Current Logged In User from LocalStorage
         let currentUser = JSON.parse(localStorage.getItem('mitratukang_user')) || {
             id: 1,
             full_name: 'Budi Santoso (Klien)',
@@ -195,7 +249,7 @@
         };
 
         document.getElementById('header-user-name').innerText = currentUser.full_name;
-        document.getElementById('welcome-user-name').innerText = currentUser.full_name;
+        document.getElementById('welcome-user-name').innerText = currentUser.full_name.split(' ')[0];
 
         function logout() {
             localStorage.removeItem('mitratukang_user');
@@ -204,17 +258,23 @@
 
         let currentOrders = [];
         let activePayOrderId = null;
+        let activeReviewOrderId = null;
+        let selectedRatingValue = 5;
 
         async function loadData() {
             try {
-                // Filter order berdasarkan ID user aktif
-                const [ordersRes, workersRes] = await Promise.all([
+                const [ordersRes, workersRes, servicesRes] = await Promise.all([
                     fetch(`/api/orders?employer_id=${currentUser.id}`),
-                    fetch('/api/workers/nearby?lat=-6.917500&lon=107.619150')
+                    fetch('/api/workers/nearby?lat=-6.917500&lon=107.619150'),
+                    fetch('/api/services')
                 ]);
                 const ordersJson = await ordersRes.json();
                 const workersJson = await workersRes.json();
+                const servicesJson = await servicesRes.json();
 
+                if (servicesJson.success) {
+                    renderServiceCatalog(servicesJson.data);
+                }
                 if (ordersJson.success) {
                     currentOrders = ordersJson.data;
                     renderOrders();
@@ -227,13 +287,36 @@
             }
         }
 
+        function renderServiceCatalog(services) {
+            const container = document.getElementById('service-catalog-grid');
+            container.innerHTML = services.map(s => `
+                <button type="button" onclick="selectServiceCatalog('${s.category}', '${s.name}', ${s.base_estimate})" class="p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl hover:border-amber-500 hover:scale-105 transition text-center space-y-2 shadow-sm group">
+                    <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center text-lg font-bold mx-auto group-hover:bg-amber-500 group-hover:text-slate-950 transition">
+                        <i class="fa-solid ${s.icon}"></i>
+                    </div>
+                    <div>
+                        <p class="font-extrabold text-[11px] text-slate-800 dark:text-white leading-tight line-clamp-2">${s.name}</p>
+                        <span class="text-[9px] text-emerald-600 dark:text-emerald-400 font-bold block mt-1">Garansi ${s.warranty_days} Hari</span>
+                    </div>
+                </button>
+            `).join('');
+        }
+
+        function selectServiceCatalog(cat, title, estPrice) {
+            document.getElementById('form-order-cat').value = cat;
+            document.getElementById('form-order-title').value = title;
+            document.getElementById('form-order-price').value = estPrice;
+            calcEscrowEstimate();
+            window.location.hash = '#form-order-title';
+        }
+
         function getStatusBadgeHtml(status) {
             const mapping = {
-                'waiting_escrow': '<span class="px-3 py-1 rounded-full text-[11px] font-bold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30"><i class="fa-solid fa-hourglass-start mr-1"></i> Menunggu Pembayaran Escrow</span>',
-                'escrow_held': '<span class="px-3 py-1 rounded-full text-[11px] font-bold bg-blue-500/15 text-blue-700 dark:text-blue-300 border border-blue-500/30"><i class="fa-solid fa-shield-halved mr-1"></i> Escrow Terkunci (Siap Kerja)</span>',
+                'waiting_escrow': '<span class="px-3 py-1 rounded-full text-[11px] font-bold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30"><i class="fa-solid fa-hourglass-start mr-1"></i> Menunggu Pembayaran</span>',
+                'escrow_held': '<span class="px-3 py-1 rounded-full text-[11px] font-bold bg-blue-500/15 text-blue-700 dark:text-blue-300 border border-blue-500/30"><i class="fa-solid fa-shield-halved mr-1"></i> Escrow Terkunci</span>',
                 'in_progress': '<span class="px-3 py-1 rounded-full text-[11px] font-bold bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border border-indigo-500/30"><i class="fa-solid fa-person-digging mr-1"></i> Sedang Dikerjakan</span>',
-                'work_submitted': '<span class="px-3 py-1 rounded-full text-[11px] font-bold bg-purple-500/15 text-purple-700 dark:text-purple-300 border border-purple-500/30"><i class="fa-solid fa-clipboard-check mr-1"></i> Selesai (Masa Review 24 Jam)</span>',
-                'completed': '<span class="px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30"><i class="fa-solid fa-circle-check mr-1"></i> Sukses & Dana Cair</span>'
+                'work_submitted': '<span class="px-3 py-1 rounded-full text-[11px] font-bold bg-purple-500/15 text-purple-700 dark:text-purple-300 border border-purple-500/30"><i class="fa-solid fa-clipboard-check mr-1"></i> Selesai (Review 24 Jam)</span>',
+                'completed': '<span class="px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30"><i class="fa-solid fa-circle-check mr-1"></i> Selesai & Bergaransi</span>'
             };
             return mapping[status] || `<span class="px-3 py-1 rounded-full text-xs font-bold bg-slate-200 dark:bg-slate-800">${status}</span>`;
         }
@@ -247,7 +330,7 @@
                     <div class="p-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl text-center space-y-2">
                         <i class="fa-solid fa-folder-open text-slate-400 text-3xl"></i>
                         <p class="font-bold text-slate-700 dark:text-slate-300 text-sm">Belum Ada Pesanan</p>
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Gunakan form di samping untuk membuat permintaan jasa tukang pertama Anda.</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Pilih salah satu layanan dari katalog di atas untuk membuat pesanan pertama Anda.</p>
                     </div>
                 `;
                 return;
@@ -264,6 +347,27 @@
                     </div>
 
                     <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">${o.description}</p>
+
+                    <!-- Foto Hasil Lapangan (Before / After Comparison) jika ada -->
+                    ${(o.photo_before_urls.length > 0 || o.photo_after_urls.length > 0) ? `
+                        <div class="p-3.5 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-2 text-xs">
+                            <p class="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5"><i class="fa-solid fa-camera text-amber-500"></i> Dokumentasi Foto Hasil Lapangan:</p>
+                            <div class="grid grid-cols-2 gap-3">
+                                ${o.photo_before_urls.length > 0 ? `
+                                    <div>
+                                        <span class="text-[10px] text-slate-500 font-bold block mb-1">Foto Kondisi Awal:</span>
+                                        <img src="${o.photo_before_urls[0]}" class="w-full h-24 object-cover rounded-xl border border-slate-200 dark:border-slate-800">
+                                    </div>
+                                ` : ''}
+                                ${o.photo_after_urls.length > 0 ? `
+                                    <div>
+                                        <span class="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold block mb-1">Foto Selesai Dikerjakan:</span>
+                                        <img src="${o.photo_after_urls[0]}" class="w-full h-24 object-cover rounded-xl border border-emerald-500/40">
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    ` : ''}
 
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3.5 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 text-xs text-slate-700 dark:text-slate-300">
                         <div>
@@ -282,6 +386,22 @@
                         </div>
                     </div>
 
+                    <!-- Warranty Badge If Completed -->
+                    ${o.status === 'completed' ? `
+                        <div class="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl flex items-center justify-between text-xs">
+                            <span class="font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
+                                <i class="fa-solid fa-certificate"></i> Garansi Perbaikan Aktif (14 Hari)
+                            </span>
+                            ${o.rating ? `
+                                <span class="font-bold text-amber-500">⭐ ${o.rating}/5 Telah Dinilai</span>
+                            ` : `
+                                <button onclick="openReviewModal(${o.id})" class="px-3 py-1 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-[11px] transition">
+                                    ⭐ Beri Bintang Ulasan
+                                </button>
+                            `}
+                        </div>
+                    ` : ''}
+
                     <div class="flex flex-wrap gap-2 pt-1">
                         ${o.status === 'waiting_escrow' ? `
                             <button onclick="openPayModal(${o.id}, '${o.order_code}', ${o.total_amount})" class="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs transition flex items-center gap-2 shadow-lg shadow-amber-500/20">
@@ -291,7 +411,7 @@
 
                         ${o.status === 'work_submitted' ? `
                             <button onclick="confirmReleaseEscrow(${o.id})" class="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs transition flex items-center gap-2 shadow-lg shadow-emerald-500/20">
-                                <i class="fa-solid fa-circle-check"></i> Konfirmasi Selesai & Cairkan Dana
+                                <i class="fa-solid fa-circle-check"></i> Konfirmasi Selesai & Aktifkan Garansi 14 Hari
                             </button>
                         ` : ''}
                     </div>
@@ -378,12 +498,46 @@
         }
 
         async function confirmReleaseEscrow(orderId) {
-            if (!confirm('Apakah hasil pekerjaan sudah diperiksa dan disetujui? Dana akan ditransfer ke saldo dompet tukang.')) return;
+            if (!confirm('Apakah hasil pekerjaan sudah diperiksa dan disetujui? Dana akan ditransfer ke saldo dompet tukang & Garansi Layanan 14 Hari diaktifkan.')) return;
             const res = await fetch(`/api/orders/${orderId}/release-escrow`, {
                 method: 'POST'
             });
             const json = await res.json();
             alert(json.message);
+            loadData();
+        }
+
+        function openReviewModal(orderId) {
+            activeReviewOrderId = orderId;
+            document.getElementById('review-modal').classList.remove('hidden');
+        }
+
+        function closeReviewModal() {
+            document.getElementById('review-modal').classList.add('hidden');
+        }
+
+        function setRating(val) {
+            selectedRatingValue = val;
+            const stars = document.querySelectorAll('.star-btn');
+            stars.forEach((s, idx) => {
+                s.className = (idx < val) ? 'star-btn text-2xl text-amber-400' : 'star-btn text-2xl text-slate-300 dark:text-slate-700';
+            });
+        }
+
+        async function submitReview() {
+            const comment = document.getElementById('review-comment-input').value;
+            const res = await fetch(`/api/orders/${activeReviewOrderId}/review`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    rating: selectedRatingValue,
+                    comment,
+                    employer_id: currentUser.id
+                })
+            });
+            const json = await res.json();
+            alert(json.message);
+            closeReviewModal();
             loadData();
         }
 

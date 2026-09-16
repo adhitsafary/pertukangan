@@ -5,7 +5,87 @@ const { validateGeofence, calculateHaversineDistance } = require('../services/sp
 const { encryptData, decryptData, generatePresignedUrl } = require('../services/encryptionService');
 
 // -------------------------------------------------------------
-// 0. AUTH REGISTER ENDPOINT (SIMPAN KE MYSQL & ENKRIPSI KTP)
+// CATALOG LAYANAN SPESIALIS KANGGO-STYLE
+// -------------------------------------------------------------
+const SERVICE_CATALOG = [
+    {
+        id: 'cat-pipa',
+        category: 'pipa',
+        name: 'Perbaikan Pipa & Saluran Air',
+        icon: 'fa-faucet-drip',
+        color: 'blue',
+        base_estimate: 150000,
+        warranty_days: 14,
+        description: 'Perbaikan pipa bocor, instalasi tandon/toren air, pasang keran, pompa air, dan sanitasi mampet.'
+    },
+    {
+        id: 'cat-atap',
+        category: 'batu',
+        name: 'Perbaikan Atap & Bocoran Genteng',
+        icon: 'fa-house-chimney-crack',
+        color: 'amber',
+        base_estimate: 250000,
+        warranty_days: 30,
+        description: 'Bongkar pasang genteng, perbaikan talang air bocor, waterproofing dak beton, dan ganti seng.'
+    },
+    {
+        id: 'cat-keramik',
+        category: 'batu',
+        name: 'Pemasangan Keramik & Lantai',
+        icon: 'fa-trowel',
+        color: 'emerald',
+        base_estimate: 200000,
+        warranty_days: 14,
+        description: 'Pasang keramik lantai, dinding kamar mandi, granit, batu alam, plin lantai, dan perbaikan nat.'
+    },
+    {
+        id: 'cat-listrik',
+        category: 'listrik',
+        name: 'Instalasi & Perbaikan Listrik',
+        icon: 'fa-bolt',
+        color: 'yellow',
+        base_estimate: 180000,
+        warranty_days: 14,
+        description: 'Instalasi jalur kabel baru, ganti MCB/sekring, pasang fitting lampu, stop kontak, dan cek korsleting.'
+    },
+    {
+        id: 'cat-cat',
+        category: 'cat',
+        name: 'Pengecatan Rumah & Plafon',
+        icon: 'fa-paint-roller',
+        color: 'purple',
+        base_estimate: 175000,
+        warranty_days: 14,
+        description: 'Pengecatan interior/eksterior, plamir dinding, cat kusen/pintu, dan pelapis anti bocor dinding.'
+    },
+    {
+        id: 'cat-kayu',
+        category: 'kayu',
+        name: 'Plafon Gypsum & Kusen Kayu',
+        icon: 'fa-tree',
+        color: 'amber',
+        base_estimate: 220000,
+        warranty_days: 14,
+        description: 'Perbaikan plafon jebol, pasang rangka hollow/gypsum, pintu kayu seret, dan partisi ruangan.'
+    },
+    {
+        id: 'cat-las',
+        category: 'las',
+        name: 'Teralis, Pagar & Kanopi Besi',
+        icon: 'fa-fire-burner',
+        color: 'rose',
+        base_estimate: 350000,
+        warranty_days: 30,
+        description: 'Fabrikasi dan las kanopi baja ringan/hollow, pagar besi minimalis, pintu folding, dan railing tangga.'
+    }
+];
+
+router.get('/services', (req, res) => {
+    res.json({ success: true, data: SERVICE_CATALOG });
+});
+
+// -------------------------------------------------------------
+// 0. AUTH REGISTER & LOGIN
 // -------------------------------------------------------------
 router.post('/auth/register', async (req, res) => {
     const connection = await pool.getConnection();
@@ -20,7 +100,6 @@ router.post('/auth/register', async (req, res) => {
             return res.status(400).json({ success: false, message: 'Nama lengkap dan nomor handphone wajib diisi.' });
         }
 
-        // Cek duplikasi nomor HP atau email
         const [existing] = await connection.query(`
             SELECT id FROM users WHERE phone_number = ? OR (email = ? AND email IS NOT NULL AND email != '')
         `, [phone_number, email || '']);
@@ -37,7 +116,6 @@ router.post('/auth/register', async (req, res) => {
 
         const userPass = password || '123456';
 
-        // 1. Insert User ke MySQL
         const [userResult] = await connection.query(`
             INSERT INTO users (phone_number, email, password, full_name, avatar_url, role, kyc_status, wallet_balance)
             VALUES (?, ?, ?, ?, ?, ?, 'verified', 0.00)
@@ -45,7 +123,6 @@ router.post('/auth/register', async (req, res) => {
 
         const newUserId = userResult.insertId;
 
-        // 2. Insert KYC jika ada NIK (Enkripsi AES-256 UU PDP)
         if (nik) {
             const encryptedNik = encryptData(nik);
             await connection.query(`
@@ -54,7 +131,6 @@ router.post('/auth/register', async (req, res) => {
             `, [newUserId, encryptedNik]);
         }
 
-        // 3. Jika role worker, buat profil tukang
         if (role === 'worker') {
             await connection.query(`
                 INSERT INTO worker_profiles (user_id, category, experience_years, hourly_rate, daily_rate, current_latitude, current_longitude, is_available, rating_average, rating_count)
@@ -89,9 +165,6 @@ router.post('/auth/register', async (req, res) => {
     }
 });
 
-// -------------------------------------------------------------
-// 0. AUTH LOGIN ENDPOINT (VERIFIKASI EMAIL/PHONE & PASSWORD)
-// -------------------------------------------------------------
 router.post('/auth/login', async (req, res) => {
     try {
         const { identifier, password } = req.body;
@@ -130,7 +203,7 @@ router.post('/auth/login', async (req, res) => {
 });
 
 // -------------------------------------------------------------
-// 1. GET ALL ORDERS (WITH RELATIONAL JOINS)
+// 1. GET ALL ORDERS
 // -------------------------------------------------------------
 router.get('/orders', async (req, res) => {
     try {
@@ -185,6 +258,11 @@ router.get('/orders', async (req, res) => {
             status: r.status,
             work_submitted_at: r.work_submitted_at,
             completed_at: r.completed_at,
+            warranty_until: r.warranty_until,
+            rating: r.rating,
+            review_comment: r.review_comment,
+            photo_before_urls: r.photo_before_urls ? JSON.parse(r.photo_before_urls) : [],
+            photo_after_urls: r.photo_after_urls ? JSON.parse(r.photo_after_urls) : [],
             created_at: r.created_at,
             employer_name: r.employer_name || 'Klien',
             worker_name: r.worker_name || 'Tukang Belum Dipilih',
@@ -240,7 +318,7 @@ router.post('/orders', async (req, res) => {
 });
 
 // -------------------------------------------------------------
-// 3. PAYMENT WEBHOOK HANDLER (SETTLE ESCROW TRANSACTION)
+// 3. PAYMENT WEBHOOK HANDLER
 // -------------------------------------------------------------
 router.post('/payment/webhook', async (req, res) => {
     try {
@@ -296,12 +374,12 @@ router.post('/payment/webhook', async (req, res) => {
 });
 
 // -------------------------------------------------------------
-// 4. TUKANG MULAI KERJA (GEOFENCING VALIDATION < 50 METER)
+// 4. TUKANG MULAI KERJA (GEOFENCING + FOTO BEFORE)
 // -------------------------------------------------------------
 router.post('/orders/:id/start-work', async (req, res) => {
     try {
         const orderId = parseInt(req.params.id);
-        const { worker_latitude, worker_longitude } = req.body;
+        const { worker_latitude, worker_longitude, photo_before } = req.body;
 
         const [orders] = await pool.query('SELECT * FROM orders WHERE id = ?', [orderId]);
         if (orders.length === 0) {
@@ -332,11 +410,15 @@ router.post('/orders/:id/start-work', async (req, res) => {
             });
         }
 
-        await pool.query('UPDATE orders SET status = "in_progress", updated_at = NOW() WHERE id = ?', [orderId]);
+        const beforePhotos = photo_before && Array.isArray(photo_before) ? JSON.stringify(photo_before) : JSON.stringify([
+            'https://images.unsplash.com/photo-1581858726788-75bc0f6a952d?w=400'
+        ]);
+
+        await pool.query('UPDATE orders SET status = "in_progress", photo_before_urls = ?, updated_at = NOW() WHERE id = ?', [beforePhotos, orderId]);
 
         res.json({
             success: true,
-            message: 'Validasi geofence GPS sukses. Pekerjaan lapangan resmi dimulai!',
+            message: 'Validasi geofence GPS sukses & Foto kondisi awal tersimpan! Pekerjaan lapangan resmi dimulai.',
             data: { order_id: orderId, status: 'in_progress', distance_meters: geoValidation.distanceMeters }
         });
     } catch (err) {
@@ -346,7 +428,7 @@ router.post('/orders/:id/start-work', async (req, res) => {
 });
 
 // -------------------------------------------------------------
-// 5. TUKANG SUBMIT SELESAI KERJA (MINIMAL 2 FOTO)
+// 5. TUKANG SUBMIT SELESAI KERJA (FOTO AFTER)
 // -------------------------------------------------------------
 router.post('/orders/:id/submit-work', async (req, res) => {
     try {
@@ -373,11 +455,20 @@ router.post('/orders/:id/submit-work', async (req, res) => {
             });
         }
 
-        await pool.query('UPDATE orders SET status = "work_submitted", work_submitted_at = NOW(), updated_at = NOW() WHERE id = ?', [orderId]);
+        const afterPhotos = JSON.stringify(evidence_photos);
+
+        await pool.query(`
+            UPDATE orders 
+            SET status = "work_submitted", 
+                work_submitted_at = NOW(), 
+                photo_after_urls = ?, 
+                updated_at = NOW() 
+            WHERE id = ?
+        `, [afterPhotos, orderId]);
 
         res.json({
             success: true,
-            message: 'Laporan hasil kerja berhasil disimpan di MySQL. Menunggu konfirmasi klien atau auto-release 24 jam.',
+            message: 'Laporan hasil kerja (Foto After) berhasil diunggah. Menunggu konfirmasi klien atau garansi auto-release 24 jam.',
             data: { order_id: orderId, status: 'work_submitted' }
         });
     } catch (err) {
@@ -387,7 +478,7 @@ router.post('/orders/:id/submit-work', async (req, res) => {
 });
 
 // -------------------------------------------------------------
-// 6. KLIEN MANUAL RELEASE ESCROW
+// 6. KLIEN MANUAL RELEASE ESCROW + GARANSI 14 HARI
 // -------------------------------------------------------------
 router.post('/orders/:id/release-escrow', async (req, res) => {
     const connection = await pool.getConnection();
@@ -418,14 +509,22 @@ router.post('/orders/:id/release-escrow', async (req, res) => {
             await connection.query('UPDATE users SET wallet_balance = wallet_balance + ? WHERE role = "admin"', [escrow.platform_cut]);
         }
 
-        await connection.query('UPDATE orders SET status = "completed", completed_at = NOW(), updated_at = NOW() WHERE id = ?', [orderId]);
+        // Set Garansi 14 Hari Aktif
+        await connection.query(`
+            UPDATE orders 
+            SET status = "completed", 
+                completed_at = NOW(), 
+                warranty_until = NOW() + INTERVAL 14 DAY, 
+                updated_at = NOW() 
+            WHERE id = ?
+        `, [orderId]);
 
         await connection.commit();
         connection.release();
 
         res.json({
             success: true,
-            message: 'Pekerjaan telah disetujui! Dana escrow berhasil ditransfer ke saldo dompet tukang di MySQL.',
+            message: 'Pekerjaan telah disetujui! Dana escrow berhasil ditransfer ke saldo dompet tukang & Garansi Layanan 14 Hari aktif.',
             data: { order_id: orderId, status: 'completed' }
         });
     } catch (err) {
@@ -437,7 +536,104 @@ router.post('/orders/:id/release-escrow', async (req, res) => {
 });
 
 // -------------------------------------------------------------
-// 7. CRON WORKER: 24-HOUR AUTO RELEASE
+// 7. RATING & ULASAN DARI WARGA
+// -------------------------------------------------------------
+router.post('/orders/:id/review', async (req, res) => {
+    try {
+        const orderId = parseInt(req.params.id);
+        const { rating, comment, employer_id } = req.body;
+
+        const [orders] = await pool.query('SELECT * FROM orders WHERE id = ?', [orderId]);
+        if (orders.length === 0) {
+            return res.status(404).json({ success: false, message: 'Order tidak ditemukan' });
+        }
+        const order = orders[0];
+
+        const rateVal = Math.min(5, Math.max(1, parseInt(rating) || 5));
+
+        // Update Order
+        await pool.query('UPDATE orders SET rating = ?, review_comment = ? WHERE id = ?', [rateVal, comment || '', orderId]);
+
+        // Insert Review
+        await pool.query(`
+            INSERT INTO reviews (order_id, employer_id, worker_id, rating, comment)
+            VALUES (?, ?, ?, ?, ?)
+        `, [orderId, order.employer_id, order.worker_id, rateVal, comment || '']);
+
+        // Update Worker Profile Average Rating
+        const [reviews] = await pool.query('SELECT AVG(rating) as avg_rating, COUNT(*) as count FROM reviews WHERE worker_id = ?', [order.worker_id]);
+        if (reviews.length > 0) {
+            await pool.query('UPDATE worker_profiles SET rating_average = ?, rating_count = ? WHERE user_id = ?', [
+                parseFloat(reviews[0].avg_rating).toFixed(1),
+                reviews[0].count,
+                order.worker_id
+            ]);
+        }
+
+        res.json({ success: true, message: 'Terima kasih! Ulasan bintang berhasil dikirim untuk mitra tukang.' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Review error', error: err.message });
+    }
+});
+
+// -------------------------------------------------------------
+// 8. TUKANG PENARIKAN SALDO DOMPET (WITHDRAWAL)
+// -------------------------------------------------------------
+router.post('/wallet/withdraw', async (req, res) => {
+    const connection = await pool.getConnection();
+    await connection.beginTransaction();
+
+    try {
+        const { user_id, amount, bank_name, account_number, account_holder } = req.body;
+        const withdrawAmount = parseFloat(amount);
+
+        if (withdrawAmount < 50000) {
+            await connection.rollback();
+            connection.release();
+            return res.status(400).json({ success: false, message: 'Minimal penarikan saldo adalah Rp50.000.' });
+        }
+
+        const [users] = await connection.query('SELECT * FROM users WHERE id = ? FOR UPDATE', [user_id]);
+        if (users.length === 0) {
+            await connection.rollback();
+            connection.release();
+            return res.status(404).json({ success: false, message: 'User tidak ditemukan' });
+        }
+
+        const user = users[0];
+        if (user.wallet_balance < withdrawAmount) {
+            await connection.rollback();
+            connection.release();
+            return res.status(400).json({ success: false, message: 'Saldo dompet tidak mencukupi untuk penarikan ini.' });
+        }
+
+        // Kurangi saldo & simpan tiket penarikan
+        await connection.query('UPDATE users SET wallet_balance = wallet_balance - ? WHERE id = ?', [withdrawAmount, user_id]);
+
+        await connection.query(`
+            INSERT INTO wallet_withdrawals (user_id, amount, bank_name, account_number, account_holder, status)
+            VALUES (?, ?, ?, ?, ?, 'approved')
+        `, [user_id, withdrawAmount, bank_name || 'BCA', account_number || '1234567890', account_holder || user.full_name]);
+
+        await connection.commit();
+        connection.release();
+
+        res.json({
+            success: true,
+            message: `Permintaan penarikan Rp${withdrawAmount.toLocaleString('id-ID')} berhasil diproses ke rekening ${bank_name}!`,
+            remaining_balance: user.wallet_balance - withdrawAmount
+        });
+    } catch (err) {
+        await connection.rollback();
+        connection.release();
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Withdrawal error', error: err.message });
+    }
+});
+
+// -------------------------------------------------------------
+// 9. CRON AUTO RELEASE & SPATIAL RADAR
 // -------------------------------------------------------------
 router.post('/orders/cron/auto-release', async (req, res) => {
     try {
@@ -459,7 +655,7 @@ router.post('/orders/cron/auto-release', async (req, res) => {
                 await conn.query('UPDATE escrow_transactions SET status = "released", released_at = NOW() WHERE id = ?', [o.escrow_id]);
                 await conn.query('UPDATE users SET wallet_balance = wallet_balance + ? WHERE id = ?', [o.worker_net_income, o.worker_id]);
                 await conn.query('UPDATE users SET wallet_balance = wallet_balance + ? WHERE role = "admin"', [o.platform_cut]);
-                await conn.query('UPDATE orders SET status = "completed", completed_at = NOW(), updated_at = NOW() WHERE id = ?', [o.id]);
+                await conn.query('UPDATE orders SET status = "completed", completed_at = NOW(), warranty_until = NOW() + INTERVAL 14 DAY, updated_at = NOW() WHERE id = ?', [o.id]);
                 
                 await conn.commit();
                 conn.release();
@@ -482,9 +678,6 @@ router.post('/orders/cron/auto-release', async (req, res) => {
     }
 });
 
-// -------------------------------------------------------------
-// 8. SPATIAL WORKER RADAR (HAVERSINE ALGORITHM FROM MYSQL)
-// -------------------------------------------------------------
 router.get('/workers/nearby', async (req, res) => {
     try {
         const { lat, lon, radius_km = 20, category } = req.query;

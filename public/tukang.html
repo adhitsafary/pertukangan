@@ -11,7 +11,7 @@
         }
     </script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
     </style>
@@ -29,9 +29,11 @@
     <header class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50 transition-colors duration-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
             <div class="flex items-center gap-3.5">
-                <div class="w-11 h-11 rounded-2xl bg-blue-500 flex items-center justify-center text-white text-xl font-black shadow-lg shadow-blue-500/20">
-                    <i class="fa-solid fa-trowel-bricks"></i>
-                </div>
+                <a href="/">
+                    <div class="w-11 h-11 rounded-2xl bg-blue-500 flex items-center justify-center text-white text-xl font-black shadow-lg shadow-blue-500/20">
+                        <i class="fa-solid fa-trowel-bricks"></i>
+                    </div>
+                </a>
                 <div>
                     <h1 class="text-lg font-extrabold text-slate-900 dark:text-white">Dashboard Tukang Lapangan</h1>
                     <p class="text-xs text-slate-500 dark:text-slate-400">Penyedia Jasa: <b id="worker-header-name" class="text-blue-600 dark:text-blue-400">Ahmad Supriyadi</b></p>
@@ -61,17 +63,23 @@
                         <h3 id="worker-profile-name" class="font-black text-slate-900 dark:text-white text-base">Ahmad Supriyadi</h3>
                         <i class="fa-solid fa-circle-check text-emerald-500 text-xs" title="KYC Verified"></i>
                     </div>
-                    <p class="text-xs text-blue-600 dark:text-blue-400 font-bold">Tukang Terverifikasi</p>
-                    <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Rating: ⭐ 5.0 (Mitra Siap Kerja)</p>
+                    <p class="text-xs text-blue-600 dark:text-blue-400 font-bold">Mitra Terverifikasi</p>
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Rating: ⭐ 5.0 (Siap Kerja)</p>
                 </div>
             </div>
 
+            <!-- Wallet & Withdrawal -->
             <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm dark:shadow-xl flex flex-col justify-between transition-colors duration-200">
-                <div>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Saldo Dompet Bersih Anda</p>
-                    <h4 id="worker-wallet-display" class="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1">Rp0</h4>
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Saldo Dompet Bersih</p>
+                        <h4 id="worker-wallet-display" class="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1">Rp750.000</h4>
+                    </div>
+                    <button onclick="openWithdrawModal()" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs shadow-md transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-money-bill-transfer"></i> Tarik Dana
+                    </button>
                 </div>
-                <p class="text-[10px] text-slate-400">Pencairan otomatis setelah order disetujui klien / 24 jam.</p>
+                <p class="text-[10px] text-slate-400 mt-2">Pencairan langsung ke rekening bank Anda (Min. Rp50.000).</p>
             </div>
 
             <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm dark:shadow-xl flex flex-col justify-between transition-colors duration-200">
@@ -89,12 +97,49 @@
         <!-- Task List -->
         <div class="space-y-4">
             <h3 class="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-                <i class="fa-solid fa-briefcase text-blue-500"></i> Tugas Lapangan yang Ditugaskan
+                <i class="fa-solid fa-briefcase text-blue-500"></i> Tugas Lapangan yang Ditugaskan ke Anda
             </h3>
             <div id="worker-orders-feed" class="space-y-4"></div>
         </div>
 
     </main>
+
+    <!-- Withdrawal Modal -->
+    <div id="withdraw-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 max-w-md w-full rounded-3xl p-6 space-y-4 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                <h4 class="font-extrabold text-slate-900 dark:text-white text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-money-bill-transfer text-emerald-500"></i> Penarikan Saldo Dompet Tukang
+                </h4>
+                <button onclick="closeWithdrawModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form onsubmit="handleWithdrawSubmit(event)" class="space-y-3.5 text-xs">
+                <div>
+                    <label class="block text-slate-700 dark:text-slate-300 font-bold mb-1">Jumlah Penarikan (Rp)</label>
+                    <input type="number" id="wd-amount" required min="50000" value="100000" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white font-bold focus:outline-none focus:border-emerald-500">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-slate-700 dark:text-slate-300 font-bold mb-1">Nama Bank / E-Wallet</label>
+                        <select id="wd-bank" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500">
+                            <option value="BCA">Bank BCA</option>
+                            <option value="Mandiri">Bank Mandiri</option>
+                            <option value="BRI">Bank BRI</option>
+                            <option value="BNI">Bank BNI</option>
+                            <option value="GoPay">GoPay / OVO</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-slate-700 dark:text-slate-300 font-bold mb-1">Nomor Rekening</label>
+                        <input type="text" id="wd-acc-no" required value="7890123456" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white font-mono focus:outline-none focus:border-emerald-500">
+                    </div>
+                </div>
+                <button type="submit" class="w-full py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/25">
+                    <i class="fa-solid fa-paper-plane"></i> Proses Transfer ke Rekening
+                </button>
+            </form>
+        </div>
+    </div>
 
     <script>
         function toggleTheme() {
@@ -111,7 +156,6 @@
         }
         updateThemeIcons();
 
-        // Get Logged In Worker
         let currentUser = JSON.parse(localStorage.getItem('mitratukang_user')) || {
             id: 2,
             full_name: 'Ahmad Supriyadi',
@@ -184,6 +228,27 @@
                         <p class="text-slate-500 dark:text-slate-400">Upah Bersih Anda: <b class="text-emerald-600 dark:text-emerald-400 font-extrabold">Rp${Number(o.base_price * 0.9).toLocaleString('id-ID')}</b> (Potongan platform 10%)</p>
                     </div>
 
+                    <!-- Foto Progress Lapangan (Before / After) -->
+                    ${(o.photo_before_urls.length > 0 || o.photo_after_urls.length > 0) ? `
+                        <div class="p-3.5 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-2 text-xs">
+                            <p class="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5"><i class="fa-solid fa-camera text-blue-500"></i> Dokumentasi Foto Hasil Lapangan:</p>
+                            <div class="grid grid-cols-2 gap-3">
+                                ${o.photo_before_urls.length > 0 ? `
+                                    <div>
+                                        <span class="text-[10px] text-slate-500 font-bold block mb-1">Foto Kondisi Awal:</span>
+                                        <img src="${o.photo_before_urls[0]}" class="w-full h-24 object-cover rounded-xl border border-slate-200 dark:border-slate-800">
+                                    </div>
+                                ` : ''}
+                                ${o.photo_after_urls.length > 0 ? `
+                                    <div>
+                                        <span class="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold block mb-1">Foto Selesai Dikerjakan:</span>
+                                        <img src="${o.photo_after_urls[0]}" class="w-full h-24 object-cover rounded-xl border border-emerald-500/40">
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    ` : ''}
+
                     <div class="flex flex-wrap gap-2 pt-1">
                         ${o.status === 'escrow_held' ? `
                             <button onclick="handleStartWork(${o.id})" class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-xs transition flex items-center gap-2 shadow-lg shadow-blue-600/25">
@@ -193,7 +258,7 @@
 
                         ${o.status === 'in_progress' ? `
                             <button onclick="handleSubmitWork(${o.id})" class="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-extrabold text-xs transition flex items-center gap-2 shadow-lg shadow-purple-600/25">
-                                <i class="fa-solid fa-camera"></i> Unggah 2 Foto Bukti & Submit Selesai
+                                <i class="fa-solid fa-camera"></i> Unggah 2 Foto Bukti Selesai (After)
                             </button>
                         ` : ''}
 
@@ -213,7 +278,8 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     worker_latitude: -6.917505,
-                    worker_longitude: 107.619155
+                    worker_longitude: 107.619155,
+                    photo_before: ['https://images.unsplash.com/photo-1581858726788-75bc0f6a952d?w=400']
                 })
             });
             const json = await res.json();
@@ -236,6 +302,41 @@
             const json = await res.json();
             alert(json.message);
             loadData();
+        }
+
+        function openWithdrawModal() {
+            document.getElementById('withdraw-modal').classList.remove('hidden');
+        }
+
+        function closeWithdrawModal() {
+            document.getElementById('withdraw-modal').classList.add('hidden');
+        }
+
+        async function handleWithdrawSubmit(e) {
+            e.preventDefault();
+            const amount = document.getElementById('wd-amount').value;
+            const bank_name = document.getElementById('wd-bank').value;
+            const account_number = document.getElementById('wd-acc-no').value;
+
+            const res = await fetch('/api/wallet/withdraw', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    user_id: currentUser.id,
+                    amount,
+                    bank_name,
+                    account_number,
+                    account_holder: currentUser.full_name
+                })
+            });
+            const json = await res.json();
+            alert(json.message);
+            if (json.success) {
+                currentUser.wallet_balance = json.remaining_balance;
+                localStorage.setItem('mitratukang_user', JSON.stringify(currentUser));
+                document.getElementById('worker-wallet-display').innerText = `Rp${Number(json.remaining_balance).toLocaleString('id-ID')}`;
+            }
+            closeWithdrawModal();
         }
 
         loadData();

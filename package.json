@@ -8,10 +8,12 @@
     "dev": "nodemon server.js"
   },
   "dependencies": {
-    "express": "^4.19.2",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
+    "cron": "^4.4.0",
+    "crypto-js": "^4.2.0",
+    "dotenv": "^16.6.1",
+    "express": "^4.19.2",
     "multer": "^1.4.5-lts.1",
-    "crypto-js": "^4.2.0"
+    "mysql2": "^3.24.4"
   }
 }

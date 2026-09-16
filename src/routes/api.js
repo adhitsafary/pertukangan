@@ -1,379 +1,409 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../config/database');
+const pool = require('../config/mysql');
 const { validateGeofence, calculateHaversineDistance } = require('../services/spatialService');
 const { encryptData, decryptData, generatePresignedUrl } = require('../services/encryptionService');
 
 // -------------------------------------------------------------
-// 1. WEBHOOK PAYMENT HANDLER (Midtrans / Xendit Simulation)
+// 1. GET ALL ORDERS (WITH RELATIONAL JOINS)
 // -------------------------------------------------------------
-router.post('/payment/webhook', (req, res) => {
-    const { order_id, transaction_status, gross_amount, transaction_id } = req.body;
+router.get('/orders', async (req, res) => {
+    try {
+        const query = `
+            SELECT 
+                o.*,
+                u_emp.full_name AS employer_name,
+                u_wrk.full_name AS worker_name,
+                e.id AS escrow_id,
+                e.payment_gateway_ref,
+                e.platform_cut,
+                e.worker_net_income,
+                e.status AS escrow_status
+            FROM orders o
+            LEFT JOIN users u_emp ON o.employer_id = u_emp.id
+            LEFT JOIN users u_wrk ON o.worker_id = u_wrk.id
+            LEFT JOIN escrow_transactions e ON e.order_id = o.id
+            ORDER BY o.created_at DESC
+        `;
+        const [rows] = await pool.query(query);
 
-    const order = db.orders.find(o => o.order_code === order_id || o.id === parseInt(order_id));
-    if (!order) {
-        return res.status(404).json({ success: false, message: 'Order tidak ditemukan' });
+        const formatted = rows.map(r => ({
+            id: r.id,
+            order_code: r.order_code,
+            employer_id: r.employer_id,
+            worker_id: r.worker_id,
+            title: r.title,
+            description: r.description,
+            job_type: r.job_type,
+            address: r.address,
+            latitude: parseFloat(r.latitude),
+            longitude: parseFloat(r.longitude),
+            base_price: parseFloat(r.base_price),
+            admin_fee: parseFloat(r.admin_fee),
+            total_amount: parseFloat(r.total_amount),
+            status: r.status,
+            work_submitted_at: r.work_submitted_at,
+            completed_at: r.completed_at,
+            created_at: r.created_at,
+            employer_name: r.employer_name || 'Klien',
+            worker_name: r.worker_name || 'Tukang Belum Dipilih',
+            escrow: r.escrow_id ? {
+                id: r.escrow_id,
+                payment_gateway_ref: r.payment_gateway_ref,
+                platform_cut: parseFloat(r.platform_cut),
+                worker_net_income: parseFloat(r.worker_net_income),
+                status: r.escrow_status
+            } : null
+        }));
+
+        res.json({ success: true, data: formatted });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Database query failed', error: err.message });
     }
+});
 
-    if (transaction_status === 'settlement' || transaction_status === 'capture') {
-        order.status = 'escrow_held';
-        order.updated_at = new Date();
+// -------------------------------------------------------------
+// 2. CREATE NEW ORDER (DRAFT -> WAITING_ESCROW)
+// -------------------------------------------------------------
+router.post('/orders', async (req, res) => {
+    try {
+        const { employer_id, worker_id, title, description, job_type, address, latitude, longitude, base_price } = req.body;
+        
+        const base = parseFloat(base_price) || 250000;
+        const adminFee = 10000;
+        const total = base + adminFee;
+        const orderCode = `MTK-${Date.now().toString().slice(-6)}`;
+        const lat = parseFloat(latitude) || -6.917500;
+        const lon = parseFloat(longitude) || 107.619150;
+        const empId = parseInt(employer_id) || 1;
+        const wrkId = worker_id ? parseInt(worker_id) : 2;
 
-        // Hitung komisi platform 10%
-        const platformCut = Math.round(order.base_price * 0.10);
-        const workerNet = order.base_price - platformCut;
+        const [result] = await pool.query(`
+            INSERT INTO orders 
+            (order_code, employer_id, worker_id, title, description, job_type, address, latitude, longitude, base_price, admin_fee, total_amount, status)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'waiting_escrow')
+        `, [orderCode, empId, wrkId, title, description, job_type || 'daily', address, lat, lon, base, adminFee, total]);
 
-        // Catat mutasi escrow
-        let escrow = db.escrow_transactions.find(e => e.order_id === order.id);
-        if (!escrow) {
-            escrow = {
-                id: db.escrow_transactions.length + 1,
-                order_id: order.id,
-                payment_gateway_ref: transaction_id || `PG-${Date.now()}`,
-                amount: order.total_amount,
-                platform_cut: platformCut,
-                worker_net_income: workerNet,
-                status: 'holding',
-                released_at: null,
-                created_at: new Date()
-            };
-            db.escrow_transactions.push(escrow);
-        } else {
-            escrow.status = 'holding';
-            escrow.payment_gateway_ref = transaction_id || escrow.payment_gateway_ref;
-        }
+        const newOrderId = result.insertId;
 
-        return res.json({
+        res.json({
             success: true,
-            message: `Payment settled. Order ${order.order_code} status updated to ESCROW_HELD.`,
-            data: {
-                order_status: order.status,
-                escrow_status: escrow.status,
-                worker_net_income: workerNet
-            }
+            message: 'Order berhasil dibuat ke database MySQL! Menunggu pembayaran rekening bersama (Escrow).',
+            data: { id: newOrderId, order_code: orderCode, total_amount: total, status: 'waiting_escrow' }
         });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Gagal membuat order', error: err.message });
     }
-
-    res.json({ success: true, message: `Webhook processed with status: ${transaction_status}` });
 });
 
 // -------------------------------------------------------------
-// 2. TUKANG MULAI KERJA (GEOFENCING VALIDATION < 50 METER)
+// 3. PAYMENT WEBHOOK HANDLER (SETTLE ESCROW TRANSACTION)
 // -------------------------------------------------------------
-router.post('/orders/:id/start-work', (req, res) => {
-    const orderId = parseInt(req.params.id);
-    const { worker_latitude, worker_longitude } = req.body;
+router.post('/payment/webhook', async (req, res) => {
+    try {
+        const { order_id, transaction_status, transaction_id } = req.body;
 
-    const order = db.orders.find(o => o.id === orderId);
-    if (!order) {
-        return res.status(404).json({ success: false, message: 'Order tidak ditemukan' });
-    }
-
-    if (order.status !== 'escrow_held') {
-        return res.status(400).json({
-            success: false,
-            message: `Gagal mulai kerja. Status order harus ESCROW_HELD (Status saat ini: ${order.status})`
-        });
-    }
-
-    // Validasi Geofencing < 50 meter
-    const geoValidation = validateGeofence(
-        parseFloat(worker_latitude),
-        parseFloat(worker_longitude),
-        order.latitude,
-        order.longitude,
-        50 // Max 50 meter
-    );
-
-    if (!geoValidation.isWithinRadius) {
-        return res.status(422).json({
-            success: false,
-            message: `Check-in ditolak! Anda berada ${geoValidation.distanceMeters}m dari lokasi proyek (Maksimal radius 50m).`,
-            distance_meters: geoValidation.distanceMeters
-        });
-    }
-
-    order.status = 'in_progress';
-    order.updated_at = new Date();
-
-    res.json({
-        success: true,
-        message: 'Validasi geofence sukses. Pekerjaan resmi dimulai!',
-        data: {
-            order_id: order.id,
-            status: order.status,
-            distance_meters: geoValidation.distanceMeters
+        const [orders] = await pool.query('SELECT * FROM orders WHERE id = ? OR order_code = ?', [order_id, order_id]);
+        if (orders.length === 0) {
+            return res.status(404).json({ success: false, message: 'Order tidak ditemukan' });
         }
-    });
-});
+        const order = orders[0];
 
-// -------------------------------------------------------------
-// 3. TUKANG SUBMIT SELESAI KERJA (MINIMAL 2 BUKTI FOTO)
-// -------------------------------------------------------------
-router.post('/orders/:id/submit-work', (req, res) => {
-    const orderId = parseInt(req.params.id);
-    const { evidence_photos, notes } = req.body;
+        if (transaction_status === 'settlement' || transaction_status === 'capture') {
+            const platformCut = Math.round(order.base_price * 0.10);
+            const workerNet = order.base_price - platformCut;
+            const ref = transaction_id || `PG-${Date.now()}`;
 
-    const order = db.orders.find(o => o.id === orderId);
-    if (!order) {
-        return res.status(404).json({ success: false, message: 'Order tidak ditemukan' });
-    }
+            // Atomic Transaction
+            const connection = await pool.getConnection();
+            await connection.beginTransaction();
 
-    if (order.status !== 'in_progress') {
-        return res.status(400).json({
-            success: false,
-            message: `Gagal submit pekerjaan. Status harus IN_PROGRESS (Status saat ini: ${order.status})`
-        });
-    }
+            try {
+                // Update Order Status
+                await connection.query('UPDATE orders SET status = "escrow_held", updated_at = NOW() WHERE id = ?', [order.id]);
 
-    if (!evidence_photos || !Array.isArray(evidence_photos) || evidence_photos.length < 2) {
-        return res.status(422).json({
-            success: false,
-            message: 'Wajib mengunggah minimal 2 foto bukti hasil pekerjaan lapangan!'
-        });
-    }
-
-    order.status = 'work_submitted';
-    order.work_submitted_at = new Date();
-    order.work_evidence_urls = evidence_photos;
-    order.completion_notes = notes || '';
-    order.updated_at = new Date();
-
-    res.json({
-        success: true,
-        message: 'Laporan hasil kerja berhasil dikirim! Menunggu konfirmasi klien atau auto-release 24 jam.',
-        data: {
-            order_id: order.id,
-            status: order.status,
-            work_submitted_at: order.work_submitted_at,
-            photos_count: evidence_photos.length
-        }
-    });
-});
-
-// -------------------------------------------------------------
-// 4. KLIEN KONFIRMASI SELESAI (MANUAL RELEASE ESCROW)
-// -------------------------------------------------------------
-router.post('/orders/:id/release-escrow', (req, res) => {
-    const orderId = parseInt(req.params.id);
-    const order = db.orders.find(o => o.id === orderId);
-
-    if (!order) {
-        return res.status(404).json({ success: false, message: 'Order tidak ditemukan' });
-    }
-
-    if (order.status !== 'work_submitted') {
-        return res.status(400).json({
-            success: false,
-            message: `Order belum berstatus WORK_SUBMITTED (Status saat ini: ${order.status})`
-        });
-    }
-
-    // Eksekusi pelepasan dana
-    const escrow = db.escrow_transactions.find(e => e.order_id === order.id);
-    if (escrow) {
-        escrow.status = 'released';
-        escrow.released_at = new Date();
-
-        // Tambahkan saldo ke dompet tukang
-        const worker = db.users.find(u => u.id === order.worker_id);
-        if (worker) {
-            worker.wallet_balance += escrow.worker_net_income;
-        }
-
-        // Tambahkan komisi ke admin platform
-        const admin = db.users.find(u => u.role === 'admin');
-        if (admin) {
-            admin.wallet_balance += escrow.platform_cut;
-        }
-    }
-
-    order.status = 'completed';
-    order.completed_at = new Date();
-    order.updated_at = new Date();
-
-    res.json({
-        success: true,
-        message: 'Pekerjaan telah dikonfirmasi selesai! Dana escrow berhasil dicairkan ke saldo dompet tukang.',
-        data: {
-            order_id: order.id,
-            status: order.status,
-            escrow_released: escrow ? escrow.worker_net_income : 0
-        }
-    });
-});
-
-// -------------------------------------------------------------
-// 5. TRIGGER BACKGROUND CRON JOB (AUTO-RELEASE 24 JAM)
-// -------------------------------------------------------------
-router.post('/orders/cron/auto-release', (req, res) => {
-    const now = Date.now();
-    const twentyFourHoursMs = 24 * 60 * 60 * 1000;
-    const releasedOrders = [];
-
-    db.orders.forEach(order => {
-        if (order.status === 'work_submitted' && order.work_submitted_at) {
-            const timePassed = now - new Date(order.work_submitted_at).getTime();
-            
-            // Cek apakah tidak ada sengketa (dispute) aktif
-            const hasActiveDispute = db.dispute_tickets.some(d => d.order_id === order.id && d.status === 'open');
-
-            if (timePassed >= twentyFourHoursMs && !hasActiveDispute) {
-                // Auto Release
-                order.status = 'completed';
-                order.completed_at = new Date();
-                order.updated_at = new Date();
-
-                const escrow = db.escrow_transactions.find(e => e.order_id === order.id);
-                if (escrow && escrow.status === 'holding') {
-                    escrow.status = 'released';
-                    escrow.released_at = new Date();
-
-                    const worker = db.users.find(u => u.id === order.worker_id);
-                    if (worker) {
-                        worker.wallet_balance += escrow.worker_net_income;
-                    }
-
-                    const admin = db.users.find(u => u.role === 'admin');
-                    if (admin) {
-                        admin.wallet_balance += escrow.platform_cut;
-                    }
+                // Insert or Update Escrow
+                const [existingEscrow] = await connection.query('SELECT * FROM escrow_transactions WHERE order_id = ?', [order.id]);
+                if (existingEscrow.length === 0) {
+                    await connection.query(`
+                        INSERT INTO escrow_transactions (order_id, payment_gateway_ref, amount, platform_cut, worker_net_income, status)
+                        VALUES (?, ?, ?, ?, ?, 'holding')
+                    `, [order.id, ref, order.total_amount, platformCut, workerNet]);
+                } else {
+                    await connection.query('UPDATE escrow_transactions SET status = "holding", payment_gateway_ref = ? WHERE order_id = ?', [ref, order.id]);
                 }
 
-                releasedOrders.push({
-                    order_code: order.order_code,
-                    worker_id: order.worker_id,
-                    amount_released: escrow ? escrow.worker_net_income : 0
+                await connection.commit();
+                connection.release();
+
+                return res.json({
+                    success: true,
+                    message: `Payment settled. Order ${order.order_code} status updated to ESCROW_HELD.`,
+                    data: { order_id: order.id, status: 'escrow_held', worker_net_income: workerNet }
                 });
+            } catch (txErr) {
+                await connection.rollback();
+                connection.release();
+                throw txErr;
             }
         }
-    });
 
-    res.json({
-        success: true,
-        message: `Cron Worker Finished: ${releasedOrders.length} order(s) auto-released.`,
-        processed_count: releasedOrders.length,
-        released_orders: releasedOrders
-    });
+        res.json({ success: true, message: `Webhook processed with status: ${transaction_status}` });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Webhook processing error', error: err.message });
+    }
 });
 
 // -------------------------------------------------------------
-// 6. SPATIAL QUERY: PENCARIAN TUKANG TERDEKAT (HAVERSINE)
+// 4. TUKANG MULAI KERJA (GEOFENCING VALIDATION < 50 METER)
 // -------------------------------------------------------------
-router.get('/workers/nearby', (req, res) => {
-    const { lat, lon, radius_km = 15, category } = req.query;
+router.post('/orders/:id/start-work', async (req, res) => {
+    try {
+        const orderId = parseInt(req.params.id);
+        const { worker_latitude, worker_longitude } = req.body;
 
-    if (!lat || !lon) {
-        return res.status(400).json({ success: false, message: 'Parameter lat dan lon wajib disertakan.' });
-    }
+        const [orders] = await pool.query('SELECT * FROM orders WHERE id = ?', [orderId]);
+        if (orders.length === 0) {
+            return res.status(404).json({ success: false, message: 'Order tidak ditemukan' });
+        }
+        const order = orders[0];
 
-    const userLat = parseFloat(lat);
-    const userLon = parseFloat(lon);
-    const maxRadiusMeters = parseFloat(radius_km) * 1000;
-
-    const nearbyWorkers = [];
-
-    db.worker_profiles.forEach(profile => {
-        if (!profile.is_available) return;
-        if (category && profile.category !== category) return;
-
-        const distanceMeters = calculateHaversineDistance(
-            userLat,
-            userLon,
-            profile.current_latitude,
-            profile.current_longitude
-        );
-
-        if (distanceMeters <= maxRadiusMeters) {
-            const user = db.users.find(u => u.id === profile.user_id);
-            nearbyWorkers.push({
-                user_id: profile.user_id,
-                full_name: user ? user.full_name : 'Tukang',
-                avatar_url: user ? user.avatar_url : '',
-                category: profile.category,
-                experience_years: profile.experience_years,
-                daily_rate: profile.daily_rate,
-                hourly_rate: profile.hourly_rate,
-                rating_average: profile.rating_average,
-                rating_count: profile.rating_count,
-                distance_km: Math.round((distanceMeters / 1000) * 10) / 10,
-                coordinates: {
-                    latitude: profile.current_latitude,
-                    longitude: profile.current_longitude
-                }
+        if (order.status !== 'escrow_held') {
+            return res.status(400).json({
+                success: false,
+                message: `Gagal mulai kerja. Status order harus ESCROW_HELD (Status saat ini: ${order.status})`
             });
         }
-    });
 
-    // Urutkan berdasarkan jarak terdekat
-    nearbyWorkers.sort((a, b) => a.distance_km - b.distance_km);
+        // Validasi Haversine < 50m
+        const geoValidation = validateGeofence(
+            parseFloat(worker_latitude),
+            parseFloat(worker_longitude),
+            parseFloat(order.latitude),
+            parseFloat(order.longitude),
+            50
+        );
 
-    res.json({
-        success: true,
-        count: nearbyWorkers.length,
-        data: nearbyWorkers
-    });
+        if (!geoValidation.isWithinRadius) {
+            return res.status(422).json({
+                success: false,
+                message: `Check-in ditolak! Anda berada ${geoValidation.distanceMeters}m dari lokasi proyek (Maksimal radius 50m).`,
+                distance_meters: geoValidation.distanceMeters
+            });
+        }
+
+        await pool.query('UPDATE orders SET status = "in_progress", updated_at = NOW() WHERE id = ?', [orderId]);
+
+        res.json({
+            success: true,
+            message: 'Validasi geofence GPS sukses. Pekerjaan lapangan resmi dimulai!',
+            data: { order_id: orderId, status: 'in_progress', distance_meters: geoValidation.distanceMeters }
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Start work error', error: err.message });
+    }
 });
 
 // -------------------------------------------------------------
-// 7. GET LIST ORDERS & USERS (UNTUK DASHBOARD DEMO)
+// 5. TUKANG SUBMIT SELESAI KERJA (MINIMAL 2 FOTO)
 // -------------------------------------------------------------
-router.get('/orders', (req, res) => {
-    const enriched = db.orders.map(o => {
-        const emp = db.users.find(u => u.id === o.employer_id);
-        const wrk = db.users.find(u => u.id === o.worker_id);
-        const esc = db.escrow_transactions.find(e => e.order_id === o.id);
-        return {
-            ...o,
-            employer_name: emp ? emp.full_name : 'Klien',
-            worker_name: wrk ? wrk.full_name : 'Tukang Belum Dipilih',
-            escrow: esc || null
-        };
-    });
-    res.json({ success: true, data: enriched });
+router.post('/orders/:id/submit-work', async (req, res) => {
+    try {
+        const orderId = parseInt(req.params.id);
+        const { evidence_photos, notes } = req.body;
+
+        const [orders] = await pool.query('SELECT * FROM orders WHERE id = ?', [orderId]);
+        if (orders.length === 0) {
+            return res.status(404).json({ success: false, message: 'Order tidak ditemukan' });
+        }
+        const order = orders[0];
+
+        if (order.status !== 'in_progress') {
+            return res.status(400).json({
+                success: false,
+                message: `Gagal submit. Status harus IN_PROGRESS (Status saat ini: ${order.status})`
+            });
+        }
+
+        if (!evidence_photos || !Array.isArray(evidence_photos) || evidence_photos.length < 2) {
+            return res.status(422).json({
+                success: false,
+                message: 'Wajib menyertakan minimal 2 foto bukti hasil pekerjaan!'
+            });
+        }
+
+        await pool.query('UPDATE orders SET status = "work_submitted", work_submitted_at = NOW(), updated_at = NOW() WHERE id = ?', [orderId]);
+
+        res.json({
+            success: true,
+            message: 'Laporan hasil kerja berhasil disimpan di MySQL. Menunggu konfirmasi klien atau auto-release 24 jam.',
+            data: { order_id: orderId, status: 'work_submitted' }
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Submit work error', error: err.message });
+    }
 });
 
-router.get('/users', (req, res) => {
-    res.json({ success: true, data: db.users });
+// -------------------------------------------------------------
+// 6. KLIEN MANUAL RELEASE ESCROW
+// -------------------------------------------------------------
+router.post('/orders/:id/release-escrow', async (req, res) => {
+    const connection = await pool.getConnection();
+    await connection.beginTransaction();
+
+    try {
+        const orderId = parseInt(req.params.id);
+        const [orders] = await connection.query('SELECT * FROM orders WHERE id = ? FOR UPDATE', [orderId]);
+        if (orders.length === 0) {
+            await connection.rollback();
+            connection.release();
+            return res.status(404).json({ success: false, message: 'Order tidak ditemukan' });
+        }
+        const order = orders[0];
+
+        if (order.status !== 'work_submitted') {
+            await connection.rollback();
+            connection.release();
+            return res.status(400).json({ success: false, message: `Status order bukan WORK_SUBMITTED (Status: ${order.status})` });
+        }
+
+        const [escrows] = await connection.query('SELECT * FROM escrow_transactions WHERE order_id = ?', [orderId]);
+        if (escrows.length > 0 && escrows[0].status === 'holding') {
+            const escrow = escrows[0];
+
+            // 1. Update Escrow status
+            await connection.query('UPDATE escrow_transactions SET status = "released", released_at = NOW() WHERE id = ?', [escrow.id]);
+
+            // 2. Credit worker wallet
+            await connection.query('UPDATE users SET wallet_balance = wallet_balance + ? WHERE id = ?', [escrow.worker_net_income, order.worker_id]);
+
+            // 3. Credit admin platform profit
+            await connection.query('UPDATE users SET wallet_balance = wallet_balance + ? WHERE role = "admin"', [escrow.platform_cut]);
+        }
+
+        // 4. Update Order to Completed
+        await connection.query('UPDATE orders SET status = "completed", completed_at = NOW(), updated_at = NOW() WHERE id = ?', [orderId]);
+
+        await connection.commit();
+        connection.release();
+
+        res.json({
+            success: true,
+            message: 'Pekerjaan telah disetujui! Dana escrow berhasil ditransfer ke saldo dompet tukang di MySQL.',
+            data: { order_id: orderId, status: 'completed' }
+        });
+    } catch (err) {
+        await connection.rollback();
+        connection.release();
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Release escrow failed', error: err.message });
+    }
 });
 
-// Buat order baru
-router.post('/orders', (req, res) => {
-    const { employer_id, title, description, job_type, address, latitude, longitude, base_price, worker_id } = req.body;
-    
-    const adminFee = 10000;
-    const base = parseFloat(base_price) || 200000;
-    const total = base + adminFee;
+// -------------------------------------------------------------
+// 7. CRON WORKER: 24-HOUR AUTO RELEASE
+// -------------------------------------------------------------
+router.post('/orders/cron/auto-release', async (req, res) => {
+    try {
+        const [orders] = await pool.query(`
+            SELECT o.*, e.id AS escrow_id, e.worker_net_income, e.platform_cut
+            FROM orders o
+            JOIN escrow_transactions e ON e.order_id = o.id
+            WHERE o.status = 'work_submitted' 
+              AND o.work_submitted_at <= NOW() - INTERVAL 24 HOUR
+              AND e.status = 'holding'
+        `);
 
-    const newOrder = {
-        id: db.orders.length + 1,
-        order_code: `MTK-${Date.now().toString().slice(-6)}`,
-        employer_id: parseInt(employer_id) || 1,
-        worker_id: worker_id ? parseInt(worker_id) : 2,
-        title,
-        description,
-        job_type: job_type || 'daily',
-        address,
-        latitude: parseFloat(latitude) || -6.917500,
-        longitude: parseFloat(longitude) || 107.619150,
-        base_price: base,
-        admin_fee: adminFee,
-        total_amount: total,
-        status: 'waiting_escrow',
-        work_submitted_at: null,
-        work_evidence_urls: [],
-        completed_at: null,
-        created_at: new Date(),
-        updated_at: new Date()
-    };
+        const releasedList = [];
 
-    db.orders.unshift(newOrder);
+        for (const o of orders) {
+            const conn = await pool.getConnection();
+            await conn.beginTransaction();
+            try {
+                await conn.query('UPDATE escrow_transactions SET status = "released", released_at = NOW() WHERE id = ?', [o.escrow_id]);
+                await conn.query('UPDATE users SET wallet_balance = wallet_balance + ? WHERE id = ?', [o.worker_net_income, o.worker_id]);
+                await conn.query('UPDATE users SET wallet_balance = wallet_balance + ? WHERE role = "admin"', [o.platform_cut]);
+                await conn.query('UPDATE orders SET status = "completed", completed_at = NOW(), updated_at = NOW() WHERE id = ?', [o.id]);
+                
+                await conn.commit();
+                conn.release();
 
-    res.json({
-        success: true,
-        message: 'Order berhasil dibuat! Menunggu pembayaran rekening bersama (Escrow).',
-        data: newOrder
-    });
+                releasedList.push(o.order_code);
+            } catch (err) {
+                await conn.rollback();
+                conn.release();
+            }
+        }
+
+        res.json({
+            success: true,
+            message: `Background Cron Worker Selesai: ${releasedList.length} pesanan otomatis di-release ke dompet tukang.`,
+            released_orders: releasedList
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Cron worker error', error: err.message });
+    }
+});
+
+// -------------------------------------------------------------
+// 8. SPATIAL WORKER RADAR (HAVERSINE ALGORITHM FROM MYSQL)
+// -------------------------------------------------------------
+router.get('/workers/nearby', async (req, res) => {
+    try {
+        const { lat, lon, radius_km = 20, category } = req.query;
+        const userLat = parseFloat(lat) || -6.917500;
+        const userLon = parseFloat(lon) || 107.619150;
+        const maxRadius = parseFloat(radius_km);
+
+        let query = `
+            SELECT 
+                wp.*,
+                u.full_name,
+                u.avatar_url,
+                (6371 * acos(
+                    cos(radians(?)) * cos(radians(wp.current_latitude)) * 
+                    cos(radians(wp.current_longitude) - radians(?)) + 
+                    sin(radians(?)) * sin(radians(wp.current_latitude))
+                )) AS distance_km
+            FROM worker_profiles wp
+            JOIN users u ON wp.user_id = u.id
+            WHERE wp.is_available = 1
+        `;
+        const params = [userLat, userLon, userLat];
+
+        if (category) {
+            query += ` AND wp.category = ?`;
+            params.push(category);
+        }
+
+        query += ` HAVING distance_km <= ? ORDER BY distance_km ASC`;
+        params.push(maxRadius);
+
+        const [rows] = await pool.query(query, params);
+
+        const formatted = rows.map(r => ({
+            user_id: r.user_id,
+            full_name: r.full_name,
+            avatar_url: r.avatar_url,
+            category: r.category,
+            experience_years: r.experience_years,
+            daily_rate: parseFloat(r.daily_rate),
+            rating_average: parseFloat(r.rating_average),
+            rating_count: r.rating_count,
+            distance_km: Math.round(r.distance_km * 10) / 10
+        }));
+
+        res.json({ success: true, count: formatted.length, data: formatted });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Spatial query failed', error: err.message });
+    }
 });
 
 module.exports = router;

@@ -1,28 +1,40 @@
 <!DOCTYPE html>
-<html lang="id" class="h-full bg-slate-950">
+<html lang="id" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard & Escrow - MitraTukang</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
     </style>
+    <script>
+        if (localStorage.getItem('mitratukang_theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
 </head>
-<body class="h-full flex flex-col bg-slate-950 text-slate-100 antialiased">
+<body class="h-full flex flex-col bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 antialiased transition-colors duration-200">
 
     <!-- Top Header -->
-    <header class="bg-slate-900/90 backdrop-blur-md border-b border-slate-800 sticky top-0 z-50">
+    <header class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50 transition-colors duration-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
             <div class="flex items-center gap-3.5">
-                <div class="w-11 h-11 rounded-2xl bg-emerald-500 flex items-center justify-center text-slate-950 text-xl font-black shadow-lg shadow-emerald-500/20">
+                <div class="w-11 h-11 rounded-2xl bg-emerald-500 flex items-center justify-center text-white text-xl font-black shadow-lg shadow-emerald-500/20">
                     <i class="fa-solid fa-building-columns"></i>
                 </div>
                 <div>
-                    <h1 class="text-lg font-extrabold text-white">Administrator & Escrow Gateway</h1>
-                    <p class="text-xs text-slate-400">Pengelola Platform & Penengah Sengketa (Dispute)</p>
+                    <h1 class="text-lg font-extrabold text-slate-900 dark:text-white">Administrator & Escrow Gateway</h1>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Pengelola Platform & Penengah Sengketa (Dispute)</p>
                 </div>
             </div>
 
@@ -30,7 +42,10 @@
                 <button onclick="triggerCronJob()" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition flex items-center gap-2 shadow-lg shadow-indigo-600/30">
                     <i class="fa-solid fa-clock-rotate-left"></i> Test Worker 24H Auto-Release
                 </button>
-                <a href="/login" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-bold transition flex items-center gap-2 border border-slate-700">
+                <button onclick="toggleTheme()" class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-amber-400 border border-slate-200 dark:border-slate-700 flex items-center justify-center transition shadow-sm">
+                    <i class="fa-solid fa-moon theme-toggle-icon text-sm"></i>
+                </button>
+                <a href="/login" class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white text-xs font-bold transition flex items-center gap-2 border border-slate-200 dark:border-slate-700">
                     <i class="fa-solid fa-arrow-right-from-bracket"></i> Keluar
                 </a>
             </div>
@@ -42,46 +57,46 @@
         
         <!-- Summary Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl shadow-xl">
-                <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Dana Escrow Tertampung</p>
-                <p class="text-2xl font-black text-amber-400 mt-1">Rp870.000</p>
-                <span class="text-[10px] text-slate-500">Dana aman di rekening penampungan</span>
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 rounded-3xl shadow-sm dark:shadow-xl transition-colors duration-200">
+                <p class="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Dana Escrow Tertampung</p>
+                <p class="text-2xl font-black text-amber-600 dark:text-amber-400 mt-1">Rp870.000</p>
+                <span class="text-[10px] text-slate-400">Dana aman di rekening penampungan</span>
             </div>
-            <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl shadow-xl">
-                <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Pendapatan Platform (10%)</p>
-                <p class="text-2xl font-black text-emerald-400 mt-1">Rp1.540.000</p>
-                <span class="text-[10px] text-slate-500">Akumulasi fee sukses transaksi</span>
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 rounded-3xl shadow-sm dark:shadow-xl transition-colors duration-200">
+                <p class="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Pendapatan Platform (10%)</p>
+                <p class="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1">Rp1.540.000</p>
+                <span class="text-[10px] text-slate-400">Akumulasi fee sukses transaksi</span>
             </div>
-            <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl shadow-xl">
-                <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Kepatuhan UU PDP (KTP)</p>
-                <p class="text-lg font-black text-blue-400 mt-1 flex items-center gap-1.5">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 rounded-3xl shadow-sm dark:shadow-xl transition-colors duration-200">
+                <p class="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Kepatuhan UU PDP (KTP)</p>
+                <p class="text-lg font-black text-blue-600 dark:text-blue-400 mt-1 flex items-center gap-1.5">
                     <i class="fa-solid fa-lock text-sm"></i> AES-256 Valid
                 </p>
-                <span class="text-[10px] text-slate-500">Presigned Temporary URLs 10 Min</span>
+                <span class="text-[10px] text-slate-400">Presigned Temporary URLs 10 Min</span>
             </div>
-            <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl shadow-xl">
-                <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Status Sengketa (Dispute)</p>
-                <p class="text-lg font-black text-emerald-400 mt-1 flex items-center gap-1.5">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 rounded-3xl shadow-sm dark:shadow-xl transition-colors duration-200">
+                <p class="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Status Sengketa (Dispute)</p>
+                <p class="text-lg font-black text-emerald-600 dark:text-emerald-400 mt-1 flex items-center gap-1.5">
                     <i class="fa-solid fa-scale-balanced text-sm"></i> 0 Tiket Aktif
                 </p>
-                <span class="text-[10px] text-slate-500">Semua pesanan berjalan lancar</span>
+                <span class="text-[10px] text-slate-400">Semua pesanan berjalan lancar</span>
             </div>
         </div>
 
         <!-- Audit Table -->
-        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm dark:shadow-xl space-y-4 transition-colors duration-200">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-4">
                 <div>
-                    <h3 class="text-base font-extrabold text-white flex items-center gap-2">
-                        <i class="fa-solid fa-receipt text-emerald-400"></i> Audit Mutasi Rekening Bersama (Escrow Transactions)
+                    <h3 class="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                        <i class="fa-solid fa-receipt text-emerald-500"></i> Audit Mutasi Rekening Bersama (Escrow Transactions)
                     </h3>
-                    <p class="text-xs text-slate-400">Log transaksi MySQL realtime dan kontrol pelepasan dana.</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Log transaksi MySQL realtime dan kontrol pelepasan dana.</p>
                 </div>
             </div>
 
             <div class="overflow-x-auto">
-                <table class="w-full text-left text-xs text-slate-300">
-                    <thead class="bg-slate-950 text-slate-400 font-extrabold uppercase text-[10px] tracking-wider border-b border-slate-800">
+                <table class="w-full text-left text-xs text-slate-700 dark:text-slate-300">
+                    <thead class="bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 font-extrabold uppercase text-[10px] tracking-wider border-b border-slate-200 dark:border-slate-800">
                         <tr>
                             <th class="py-3 px-4">Order Code</th>
                             <th class="py-3 px-4">Pekerjaan</th>
@@ -92,7 +107,7 @@
                             <th class="py-3 px-4 text-center">Status Escrow</th>
                         </tr>
                     </thead>
-                    <tbody id="admin-escrow-table-body" class="divide-y divide-slate-800/80"></tbody>
+                    <tbody id="admin-escrow-table-body" class="divide-y divide-slate-100 dark:divide-slate-800/80"></tbody>
                 </table>
             </div>
         </div>
@@ -100,6 +115,20 @@
     </main>
 
     <script>
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('mitratukang_theme', isDark ? 'dark' : 'light');
+            updateThemeIcons();
+        }
+
+        function updateThemeIcons() {
+            const isDark = document.documentElement.classList.contains('dark');
+            document.querySelectorAll('.theme-toggle-icon').forEach(icon => {
+                icon.className = isDark ? 'fa-solid fa-sun theme-toggle-icon text-amber-400 text-sm' : 'fa-solid fa-moon theme-toggle-icon text-slate-600 text-sm';
+            });
+        }
+        updateThemeIcons();
+
         let currentOrders = [];
 
         async function loadData() {
@@ -117,25 +146,25 @@
 
         function getStatusBadgeHtml(status) {
             const mapping = {
-                'waiting_escrow': '<span class="px-3 py-1 rounded-full text-[11px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">Menunggu Pembayaran</span>',
-                'escrow_held': '<span class="px-3 py-1 rounded-full text-[11px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/40">Escrow Terkunci</span>',
-                'in_progress': '<span class="px-3 py-1 rounded-full text-[11px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/40">Sedang Dikerjakan</span>',
-                'work_submitted': '<span class="px-3 py-1 rounded-full text-[11px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/40">Review 24 Jam</span>',
-                'completed': '<span class="px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">Sukses / Released</span>'
+                'waiting_escrow': '<span class="px-3 py-1 rounded-full text-[11px] font-bold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30">Menunggu Pembayaran</span>',
+                'escrow_held': '<span class="px-3 py-1 rounded-full text-[11px] font-bold bg-blue-500/15 text-blue-700 dark:text-blue-300 border border-blue-500/30">Escrow Terkunci</span>',
+                'in_progress': '<span class="px-3 py-1 rounded-full text-[11px] font-bold bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border border-indigo-500/30">Sedang Dikerjakan</span>',
+                'work_submitted': '<span class="px-3 py-1 rounded-full text-[11px] font-bold bg-purple-500/15 text-purple-700 dark:text-purple-300 border border-purple-500/30">Review 24 Jam</span>',
+                'completed': '<span class="px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">Sukses / Released</span>'
             };
-            return mapping[status] || `<span class="px-3 py-1 rounded-full text-xs font-bold bg-slate-800">${status}</span>`;
+            return mapping[status] || `<span class="px-3 py-1 rounded-full text-xs font-bold bg-slate-200 dark:bg-slate-800">${status}</span>`;
         }
 
         function renderAdminView() {
             const tbody = document.getElementById('admin-escrow-table-body');
             tbody.innerHTML = currentOrders.map(o => `
-                <tr class="hover:bg-slate-950/40 transition">
-                    <td class="py-3.5 px-4 font-mono font-bold text-slate-400">${o.order_code}</td>
-                    <td class="py-3.5 px-4 font-bold text-white">${o.title}</td>
-                    <td class="py-3.5 px-4 text-slate-300">${o.employer_name} ➔ ${o.worker_name}</td>
-                    <td class="py-3.5 px-4 text-right font-extrabold text-amber-400">Rp${Number(o.total_amount).toLocaleString('id-ID')}</td>
-                    <td class="py-3.5 px-4 text-right font-bold text-slate-400">Rp${Number(o.escrow ? o.escrow.platform_cut : o.base_price * 0.1).toLocaleString('id-ID')}</td>
-                    <td class="py-3.5 px-4 text-right font-extrabold text-emerald-400">Rp${Number(o.escrow ? o.escrow.worker_net_income : o.base_price * 0.9).toLocaleString('id-ID')}</td>
+                <tr class="hover:bg-slate-50 dark:hover:bg-slate-950/40 transition">
+                    <td class="py-3.5 px-4 font-mono font-bold text-slate-500 dark:text-slate-400">${o.order_code}</td>
+                    <td class="py-3.5 px-4 font-bold text-slate-900 dark:text-white">${o.title}</td>
+                    <td class="py-3.5 px-4 text-slate-600 dark:text-slate-300">${o.employer_name} ➔ ${o.worker_name}</td>
+                    <td class="py-3.5 px-4 text-right font-extrabold text-amber-600 dark:text-amber-400">Rp${Number(o.total_amount).toLocaleString('id-ID')}</td>
+                    <td class="py-3.5 px-4 text-right font-bold text-slate-500 dark:text-slate-400">Rp${Number(o.escrow ? o.escrow.platform_cut : o.base_price * 0.1).toLocaleString('id-ID')}</td>
+                    <td class="py-3.5 px-4 text-right font-extrabold text-emerald-600 dark:text-emerald-400">Rp${Number(o.escrow ? o.escrow.worker_net_income : o.base_price * 0.9).toLocaleString('id-ID')}</td>
                     <td class="py-3.5 px-4 text-center">${getStatusBadgeHtml(o.status)}</td>
                 </tr>
             `).join('');

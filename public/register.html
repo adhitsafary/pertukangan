@@ -1,31 +1,52 @@
 <!DOCTYPE html>
-<html lang="id" class="h-full bg-slate-950">
+<html lang="id" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pendaftaran Akun Baru - MitraTukang</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
     </style>
+    <script>
+        if (localStorage.getItem('mitratukang_theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
 </head>
-<body class="h-full flex flex-col justify-center items-center bg-slate-950 text-slate-100 p-4 relative overflow-y-auto custom-scrollbar">
+<body class="h-full flex flex-col justify-center items-center bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 p-4 relative overflow-y-auto transition-colors duration-200">
+
+    <!-- Top Theme Toggle Floating -->
+    <div class="absolute top-6 right-6 z-20">
+        <button onclick="toggleTheme()" class="w-10 h-10 rounded-2xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-amber-400 border border-slate-200 dark:border-slate-800 flex items-center justify-center transition shadow-md">
+            <i class="fa-solid fa-moon theme-toggle-icon text-sm"></i>
+        </button>
+    </div>
 
     <!-- Background Glow Elements -->
     <div class="absolute -top-40 -left-40 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
     <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-    <div class="max-w-lg w-full bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl space-y-6 relative z-10 backdrop-blur-xl my-8">
+    <div class="max-w-lg w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-2xl space-y-6 relative z-10 backdrop-blur-xl my-8 transition-colors duration-200">
         
         <!-- Header -->
         <div class="text-center space-y-2">
-            <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-600 to-amber-400 flex items-center justify-center text-slate-950 text-2xl font-black mx-auto shadow-lg shadow-amber-500/25">
-                <i class="fa-solid fa-user-plus"></i>
-            </div>
-            <h1 class="text-2xl font-black text-white tracking-tight">Daftar Akun Baru</h1>
-            <p class="text-xs text-slate-400">Bergabung ke Ekosistem Jasa Konstruksi MitraTukang</p>
+            <a href="/" class="inline-block">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-600 to-amber-400 flex items-center justify-center text-slate-950 text-2xl font-black mx-auto shadow-lg shadow-amber-500/25">
+                    <i class="fa-solid fa-user-plus"></i>
+                </div>
+            </a>
+            <h1 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Daftar Akun Baru</h1>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Bergabung ke Ekosistem Jasa Konstruksi MitraTukang</p>
         </div>
 
         <!-- Form Register -->
@@ -33,21 +54,21 @@
             
             <!-- Pilihan Role Akun -->
             <div>
-                <label class="block text-slate-300 font-bold mb-2">Daftar Sebagai:</label>
+                <label class="block text-slate-700 dark:text-slate-300 font-bold mb-2">Daftar Sebagai:</label>
                 <div class="grid grid-cols-2 gap-3">
-                    <label class="p-3 bg-slate-950 border border-slate-800 rounded-2xl flex items-center gap-3 cursor-pointer hover:border-amber-500 transition has-[:checked]:border-amber-500 has-[:checked]:bg-amber-500/10">
+                    <label class="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl flex items-center gap-3 cursor-pointer hover:border-amber-500 transition has-[:checked]:border-amber-500 has-[:checked]:bg-amber-500/10">
                         <input type="radio" name="role" value="employer" checked onchange="toggleWorkerFields()" class="text-amber-500 focus:ring-0">
                         <div>
-                            <p class="font-extrabold text-white text-xs">Pencari Tukang (Warga)</p>
-                            <p class="text-[10px] text-slate-400">Pemilik hunian / Mandor</p>
+                            <p class="font-extrabold text-slate-900 dark:text-white text-xs">Pencari Tukang (Warga)</p>
+                            <p class="text-[10px] text-slate-500 dark:text-slate-400">Pemilik hunian / Mandor</p>
                         </div>
                     </label>
 
-                    <label class="p-3 bg-slate-950 border border-slate-800 rounded-2xl flex items-center gap-3 cursor-pointer hover:border-blue-500 transition has-[:checked]:border-blue-500 has-[:checked]:bg-blue-500/10">
+                    <label class="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl flex items-center gap-3 cursor-pointer hover:border-blue-500 transition has-[:checked]:border-blue-500 has-[:checked]:bg-blue-500/10">
                         <input type="radio" name="role" value="worker" onchange="toggleWorkerFields()" class="text-blue-500 focus:ring-0">
                         <div>
-                            <p class="font-extrabold text-white text-xs">Mitra Tukang</p>
-                            <p class="text-[10px] text-slate-400">Penyedia Jasa Lapangan</p>
+                            <p class="font-extrabold text-slate-900 dark:text-white text-xs">Mitra Tukang</p>
+                            <p class="text-[10px] text-slate-500 dark:text-slate-400">Penyedia Jasa Lapangan</p>
                         </div>
                     </label>
                 </div>
@@ -55,40 +76,40 @@
 
             <!-- Nama Lengkap -->
             <div>
-                <label class="block text-slate-300 font-bold mb-1">Nama Lengkap (Sesuai KTP)</label>
-                <input type="text" id="reg-name" required placeholder="Cth: Budi Santoso" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-amber-500">
+                <label class="block text-slate-700 dark:text-slate-300 font-bold mb-1">Nama Lengkap (Sesuai KTP)</label>
+                <input type="text" id="reg-name" required placeholder="Cth: Budi Santoso" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500">
             </div>
 
             <!-- Nomor HP / WhatsApp -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                    <label class="block text-slate-300 font-bold mb-1">No. WhatsApp (OTP)</label>
-                    <input type="tel" id="reg-phone" required placeholder="081234567890" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-amber-500">
+                    <label class="block text-slate-700 dark:text-slate-300 font-bold mb-1">No. WhatsApp (OTP)</label>
+                    <input type="tel" id="reg-phone" required placeholder="081234567890" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500">
                 </div>
                 <div>
-                    <label class="block text-slate-300 font-bold mb-1">Email (Opsional)</label>
-                    <input type="email" id="reg-email" placeholder="budi@gmail.com" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-amber-500">
+                    <label class="block text-slate-700 dark:text-slate-300 font-bold mb-1">Email (Opsional)</label>
+                    <input type="email" id="reg-email" placeholder="budi@gmail.com" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500">
                 </div>
             </div>
 
             <!-- NIK KTP (Enkripsi UU PDP) -->
             <div>
-                <label class="block text-slate-300 font-bold mb-1 flex items-center justify-between">
+                <label class="block text-slate-700 dark:text-slate-300 font-bold mb-1 flex items-center justify-between">
                     <span>Nomor NIK KTP</span>
-                    <span class="text-[10px] text-emerald-400 font-normal"><i class="fa-solid fa-lock"></i> Enkripsi AES-256</span>
+                    <span class="text-[10px] text-emerald-600 dark:text-emerald-400 font-normal"><i class="fa-solid fa-lock"></i> Enkripsi AES-256</span>
                 </label>
-                <input type="password" id="reg-nik" required placeholder="3204xxxxxxxxxxxx" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-amber-500 font-mono">
+                <input type="password" id="reg-nik" required placeholder="3204xxxxxxxxxxxx" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500 font-mono">
             </div>
 
             <!-- Khusus Tukang: Kategori Keahlian -->
-            <div id="worker-extra-fields" class="hidden space-y-3 p-4 bg-slate-950 rounded-2xl border border-slate-800">
-                <p class="font-bold text-amber-400 text-xs flex items-center gap-1.5">
+            <div id="worker-extra-fields" class="hidden space-y-3 p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800">
+                <p class="font-bold text-amber-600 dark:text-amber-400 text-xs flex items-center gap-1.5">
                     <i class="fa-solid fa-briefcase"></i> Data Profil Keahlian Mitra
                 </p>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-slate-400 font-semibold mb-1">Keahlian Utama</label>
-                        <select id="reg-category" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white text-xs">
+                        <label class="block text-slate-600 dark:text-slate-400 font-semibold mb-1">Keahlian Utama</label>
+                        <select id="reg-category" class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white text-xs">
                             <option value="batu">Tukang Batu & Keramik</option>
                             <option value="kayu">Tukang Kayu</option>
                             <option value="pipa">Tukang Pipa</option>
@@ -98,8 +119,8 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-slate-400 font-semibold mb-1">Tarif Harian (Rp)</label>
-                        <input type="number" id="reg-daily-rate" value="200000" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white text-xs">
+                        <label class="block text-slate-600 dark:text-slate-400 font-semibold mb-1">Tarif Harian (Rp)</label>
+                        <input type="number" id="reg-daily-rate" value="200000" class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white text-xs">
                     </div>
                 </div>
             </div>
@@ -109,16 +130,29 @@
             </button>
         </form>
 
-        <div class="text-center pt-2">
-            <p class="text-xs text-slate-400">
-                Sudah memiliki akun? <a href="/login" class="text-amber-400 font-bold hover:underline">Masuk ke Portal</a>
+        <div class="text-center pt-1">
+            <p class="text-xs text-slate-500 dark:text-slate-400">
+                Sudah memiliki akun? <a href="/login" class="text-amber-600 dark:text-amber-400 font-bold hover:underline">Masuk ke Portal</a>
             </p>
         </div>
 
     </div>
 
     <script>
-        // Check URL query param for default role
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('mitratukang_theme', isDark ? 'dark' : 'light');
+            updateThemeIcons();
+        }
+
+        function updateThemeIcons() {
+            const isDark = document.documentElement.classList.contains('dark');
+            document.querySelectorAll('.theme-toggle-icon').forEach(icon => {
+                icon.className = isDark ? 'fa-solid fa-sun theme-toggle-icon text-amber-400 text-sm' : 'fa-solid fa-moon theme-toggle-icon text-slate-600 text-sm';
+            });
+        }
+        updateThemeIcons();
+
         const urlParams = new URLSearchParams(window.location.search);
         const roleParam = urlParams.get('role');
         if (roleParam === 'worker') {
@@ -135,11 +169,8 @@
             e.preventDefault();
             const role = document.querySelector('input[name="role"]:checked').value;
             const full_name = document.getElementById('reg-name').value;
-            const phone_number = document.getElementById('reg-phone').value;
-            const email = document.getElementById('reg-email').value;
-            const nik = document.getElementById('reg-nik').value;
 
-            alert(`✅ Pendaftaran Berhasil!\nSelamat datang, ${full_name}.\nData NIK KTP telah diamankan dengan enkripsi AES-256 (Kepatuhan UU PDP).\n\nAnda akan dialihkan ke dashboard.`);
+            alert(`✅ Pendaftaran Berhasil!\nSelamat datang, ${full_name}.\nData NIK KTP Anda telah diamankan dengan enkripsi AES-256 (Kepatuhan UU PDP).\n\nAnda akan dialihkan ke dashboard.`);
 
             if (role === 'employer') {
                 window.location.href = '/warga';

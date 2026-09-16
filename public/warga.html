@@ -1,34 +1,49 @@
 <!DOCTYPE html>
-<html lang="id" class="h-full bg-slate-950">
+<html lang="id" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal Warga (Klien) - MitraTukang</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
     </style>
+    <script>
+        if (localStorage.getItem('mitratukang_theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
 </head>
-<body class="h-full flex flex-col bg-slate-950 text-slate-100 antialiased">
+<body class="h-full flex flex-col bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 antialiased transition-colors duration-200">
 
     <!-- Top Navigation Header -->
-    <header class="bg-slate-900/90 backdrop-blur-md border-b border-slate-800 sticky top-0 z-50">
+    <header class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50 transition-colors duration-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
             <div class="flex items-center gap-3.5">
                 <div class="w-11 h-11 rounded-2xl bg-amber-500 flex items-center justify-center text-slate-950 text-xl font-black shadow-lg shadow-amber-500/20">
                     <i class="fa-solid fa-house-user"></i>
                 </div>
                 <div>
-                    <h1 class="text-lg font-extrabold text-white">Portal Warga / Pencari Tukang</h1>
-                    <p class="text-xs text-slate-400">User: <b class="text-amber-400">Budi Santoso (Klien)</b></p>
+                    <h1 class="text-lg font-extrabold text-slate-900 dark:text-white">Portal Warga / Pencari Tukang</h1>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">User: <b class="text-amber-600 dark:text-amber-400">Budi Santoso (Klien)</b></p>
                 </div>
             </div>
 
             <div class="flex items-center gap-3">
-                <a href="/login" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-bold transition flex items-center gap-2 border border-slate-700">
-                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Keluar / Ganti Role
+                <button onclick="toggleTheme()" class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-amber-400 border border-slate-200 dark:border-slate-700 flex items-center justify-center transition shadow-sm">
+                    <i class="fa-solid fa-moon theme-toggle-icon text-sm"></i>
+                </button>
+                <a href="/login" class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white text-xs font-bold transition flex items-center gap-2 border border-slate-200 dark:border-slate-700">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Keluar
                 </a>
             </div>
         </div>
@@ -37,13 +52,13 @@
     <!-- Main Content -->
     <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
         
-        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 via-amber-950/40 to-slate-900 border border-slate-800 p-6 shadow-xl flex items-center justify-between">
+        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-amber-50 via-amber-100/40 to-slate-100 dark:from-slate-900 dark:via-amber-950/40 dark:to-slate-900 border border-amber-200 dark:border-slate-800 p-6 shadow-sm dark:shadow-xl flex items-center justify-between transition-colors duration-200">
             <div>
-                <span class="px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 inline-flex items-center gap-1.5 mb-2">
-                    <i class="fa-solid fa-shield-halved text-emerald-400"></i> Rekber Escrow Aktif
+                <span class="px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/30 inline-flex items-center gap-1.5 mb-2">
+                    <i class="fa-solid fa-shield-halved text-emerald-600 dark:text-emerald-400"></i> Rekber Escrow Aktif
                 </span>
-                <h2 class="text-2xl font-black text-white">Selamat Datang di Portal Warga</h2>
-                <p class="text-xs text-slate-400 mt-1">Pesan tukang terpercaya dan dana Anda aman 100% sampai pekerjaan tuntas disetujui.</p>
+                <h2 class="text-2xl font-black text-slate-900 dark:text-white">Selamat Datang di Portal Warga</h2>
+                <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">Pesan tukang terpercaya dan dana Anda aman 100% sampai pekerjaan tuntas disetujui.</p>
             </div>
         </div>
 
@@ -51,20 +66,19 @@
             
             <!-- Left: Form Pemesanan & Radar Tukang -->
             <div class="lg:col-span-4 space-y-6">
-                <!-- Form Pesan Tukang -->
-                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
-                    <h3 class="font-extrabold text-white text-sm flex items-center gap-2 border-b border-slate-800 pb-3">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-md dark:shadow-xl space-y-4 transition-colors duration-200">
+                    <h3 class="font-extrabold text-slate-900 dark:text-white text-sm flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
                         <i class="fa-solid fa-file-circle-plus text-amber-500"></i> Buat Permintaan Tukang
                     </h3>
                     <form onsubmit="submitNewOrder(event)" class="space-y-3.5 text-xs">
                         <div>
-                            <label class="block text-slate-300 font-bold mb-1">Judul Pekerjaan</label>
-                            <input type="text" id="form-order-title" required placeholder="Cth: Pasang Keramik Teras Depan" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-amber-500">
+                            <label class="block text-slate-700 dark:text-slate-300 font-bold mb-1">Judul Pekerjaan</label>
+                            <input type="text" id="form-order-title" required placeholder="Cth: Pasang Keramik Teras Depan" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500">
                         </div>
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="block text-slate-300 font-bold mb-1">Kategori</label>
-                                <select id="form-order-cat" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-amber-500">
+                                <label class="block text-slate-700 dark:text-slate-300 font-bold mb-1">Kategori</label>
+                                <select id="form-order-cat" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500">
                                     <option value="batu">Tukang Batu & Keramik</option>
                                     <option value="kayu">Tukang Kayu</option>
                                     <option value="pipa">Tukang Pipa / Saluran</option>
@@ -74,31 +88,31 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-slate-300 font-bold mb-1">Sistem Upah</label>
-                                <select id="form-order-jobtype" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-amber-500">
+                                <label class="block text-slate-700 dark:text-slate-300 font-bold mb-1">Sistem Upah</label>
+                                <select id="form-order-jobtype" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500">
                                     <option value="daily">Harian</option>
                                     <option value="project_based">Borongan</option>
                                 </select>
                             </div>
                         </div>
                         <div>
-                            <label class="block text-slate-300 font-bold mb-1">Estimasi Upah (Rp)</label>
-                            <input type="number" id="form-order-price" required value="250000" oninput="calcEscrowEstimate()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-white font-bold focus:outline-none focus:border-amber-500">
+                            <label class="block text-slate-700 dark:text-slate-300 font-bold mb-1">Estimasi Upah (Rp)</label>
+                            <input type="number" id="form-order-price" required value="250000" oninput="calcEscrowEstimate()" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white font-bold focus:outline-none focus:border-amber-500">
                         </div>
                         <div>
-                            <label class="block text-slate-300 font-bold mb-1">Alamat Proyek</label>
-                            <textarea id="form-order-address" rows="2" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-amber-500">Jl. Riau No. 45, Bandung</textarea>
+                            <label class="block text-slate-700 dark:text-slate-300 font-bold mb-1">Alamat Proyek</label>
+                            <textarea id="form-order-address" rows="2" required class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500">Jl. Riau No. 45, Bandung</textarea>
                         </div>
-                        <div class="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-1">
-                            <div class="flex justify-between text-slate-400">
+                        <div class="p-3 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-1">
+                            <div class="flex justify-between text-slate-500 dark:text-slate-400">
                                 <span>Upah Jasa:</span>
-                                <span id="txt-calc-base" class="text-white font-semibold">Rp250.000</span>
+                                <span id="txt-calc-base" class="text-slate-900 dark:text-white font-semibold">Rp250.000</span>
                             </div>
-                            <div class="flex justify-between text-slate-400">
+                            <div class="flex justify-between text-slate-500 dark:text-slate-400">
                                 <span>Platform Fee:</span>
-                                <span class="text-white font-semibold">Rp10.000</span>
+                                <span class="text-slate-900 dark:text-white font-semibold">Rp10.000</span>
                             </div>
-                            <div class="border-t border-slate-800 pt-1 flex justify-between font-extrabold text-amber-400 text-sm">
+                            <div class="border-t border-slate-200 dark:border-slate-800 pt-1 flex justify-between font-extrabold text-amber-600 dark:text-amber-400 text-sm">
                                 <span>Total Escrow:</span>
                                 <span id="txt-calc-total">Rp260.000</span>
                             </div>
@@ -109,11 +123,10 @@
                     </form>
                 </div>
 
-                <!-- Radar Tukang Terdekat -->
-                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
-                    <h3 class="font-extrabold text-white text-sm flex items-center justify-between border-b border-slate-800 pb-3">
-                        <span class="flex items-center gap-2"><i class="fa-solid fa-compass text-blue-400"></i> Tukang di Sekitar Anda</span>
-                        <span class="text-[10px] bg-blue-950 text-blue-300 px-2 py-0.5 rounded font-mono">Haversine GPS</span>
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-md dark:shadow-xl space-y-4 transition-colors duration-200">
+                    <h3 class="font-extrabold text-slate-900 dark:text-white text-sm flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                        <span class="flex items-center gap-2"><i class="fa-solid fa-compass text-blue-500"></i> Tukang di Sekitar Anda</span>
+                        <span class="text-[10px] bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-300 px-2 py-0.5 rounded font-mono">Haversine GPS</span>
                     </h3>
                     <div id="nearby-workers-list" class="space-y-3"></div>
                 </div>
@@ -122,10 +135,10 @@
             <!-- Right: Daftar Pesanan Saya -->
             <div class="lg:col-span-8 space-y-4">
                 <div class="flex items-center justify-between">
-                    <h3 class="text-base font-extrabold text-white flex items-center gap-2">
+                    <h3 class="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
                         <i class="fa-solid fa-list-check text-amber-500"></i> Daftar Pesanan Jasa Anda
                     </h3>
-                    <span id="client-total-badge" class="text-xs bg-slate-900 border border-slate-800 px-3 py-1 rounded-full text-slate-400 font-bold">Memuat...</span>
+                    <span id="client-total-badge" class="text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-3 py-1 rounded-full text-slate-500 dark:text-slate-400 font-bold">Memuat...</span>
                 </div>
                 <div id="client-orders-feed" class="space-y-4"></div>
             </div>
@@ -136,20 +149,20 @@
 
     <!-- Payment Modal -->
     <div id="payment-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-700 max-w-md w-full rounded-3xl p-6 space-y-5 shadow-2xl">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                <h4 class="font-extrabold text-white text-sm flex items-center gap-2">
-                    <i class="fa-solid fa-qrcode text-emerald-400"></i> Pembayaran Rekening Bersama (Escrow)
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 max-w-md w-full rounded-3xl p-6 space-y-5 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                <h4 class="font-extrabold text-slate-900 dark:text-white text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-qrcode text-emerald-500"></i> Pembayaran Rekening Bersama (Escrow)
                 </h4>
-                <button onclick="closePayModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+                <button onclick="closePayModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="text-center space-y-3 py-1">
-                <div class="p-4 bg-white rounded-2xl inline-block shadow-lg">
+                <div class="p-4 bg-white rounded-2xl inline-block shadow-md border border-slate-100">
                     <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=MITRATUKANG-ESCROW" class="w-40 h-40 mx-auto">
                 </div>
                 <div>
-                    <span class="text-xs text-slate-400">Total Tagihan Escrow:</span>
-                    <p id="modal-amount-text" class="text-2xl font-black text-amber-400 mt-0.5">Rp260.000</p>
+                    <span class="text-xs text-slate-500 dark:text-slate-400">Total Tagihan Escrow:</span>
+                    <p id="modal-amount-text" class="text-2xl font-black text-amber-600 dark:text-amber-400 mt-0.5">Rp260.000</p>
                     <p id="modal-ordercode-text" class="text-xs font-mono text-slate-400 mt-1">MTK-202609-001</p>
                 </div>
             </div>
@@ -160,6 +173,20 @@
     </div>
 
     <script>
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('mitratukang_theme', isDark ? 'dark' : 'light');
+            updateThemeIcons();
+        }
+
+        function updateThemeIcons() {
+            const isDark = document.documentElement.classList.contains('dark');
+            document.querySelectorAll('.theme-toggle-icon').forEach(icon => {
+                icon.className = isDark ? 'fa-solid fa-sun theme-toggle-icon text-amber-400 text-sm' : 'fa-solid fa-moon theme-toggle-icon text-slate-600 text-sm';
+            });
+        }
+        updateThemeIcons();
+
         let currentOrders = [];
         let activePayOrderId = null;
 
@@ -186,13 +213,13 @@
 
         function getStatusBadgeHtml(status) {
             const mapping = {
-                'waiting_escrow': '<span class="px-3 py-1 rounded-full text-[11px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40"><i class="fa-solid fa-hourglass-start mr-1"></i> Menunggu Pembayaran Escrow</span>',
-                'escrow_held': '<span class="px-3 py-1 rounded-full text-[11px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/40"><i class="fa-solid fa-shield-halved mr-1"></i> Escrow Terkunci (Siap Kerja)</span>',
-                'in_progress': '<span class="px-3 py-1 rounded-full text-[11px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/40"><i class="fa-solid fa-person-digging mr-1"></i> Sedang Dikerjakan</span>',
-                'work_submitted': '<span class="px-3 py-1 rounded-full text-[11px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/40"><i class="fa-solid fa-clipboard-check mr-1"></i> Selesai (Masa Review 24 Jam)</span>',
-                'completed': '<span class="px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40"><i class="fa-solid fa-circle-check mr-1"></i> Sukses & Dana Cair</span>'
+                'waiting_escrow': '<span class="px-3 py-1 rounded-full text-[11px] font-bold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30"><i class="fa-solid fa-hourglass-start mr-1"></i> Menunggu Pembayaran Escrow</span>',
+                'escrow_held': '<span class="px-3 py-1 rounded-full text-[11px] font-bold bg-blue-500/15 text-blue-700 dark:text-blue-300 border border-blue-500/30"><i class="fa-solid fa-shield-halved mr-1"></i> Escrow Terkunci (Siap Kerja)</span>',
+                'in_progress': '<span class="px-3 py-1 rounded-full text-[11px] font-bold bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border border-indigo-500/30"><i class="fa-solid fa-person-digging mr-1"></i> Sedang Dikerjakan</span>',
+                'work_submitted': '<span class="px-3 py-1 rounded-full text-[11px] font-bold bg-purple-500/15 text-purple-700 dark:text-purple-300 border border-purple-500/30"><i class="fa-solid fa-clipboard-check mr-1"></i> Selesai (Masa Review 24 Jam)</span>',
+                'completed': '<span class="px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30"><i class="fa-solid fa-circle-check mr-1"></i> Sukses & Dana Cair</span>'
             };
-            return mapping[status] || `<span class="px-3 py-1 rounded-full text-xs font-bold bg-slate-800">${status}</span>`;
+            return mapping[status] || `<span class="px-3 py-1 rounded-full text-xs font-bold bg-slate-200 dark:bg-slate-800">${status}</span>`;
         }
 
         function renderOrders() {
@@ -200,31 +227,31 @@
             document.getElementById('client-total-badge').innerText = `${currentOrders.length} Pesanan`;
 
             container.innerHTML = currentOrders.map(o => `
-                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4 hover:border-slate-700 transition shadow-xl">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 space-y-4 hover:border-slate-300 dark:hover:border-slate-700 transition shadow-sm dark:shadow-xl">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
                         <div>
-                            <span class="text-xs font-mono font-bold text-slate-500">${o.order_code}</span>
-                            <h4 class="text-base font-extrabold text-white">${o.title}</h4>
+                            <span class="text-xs font-mono font-bold text-slate-400">${o.order_code}</span>
+                            <h4 class="text-base font-extrabold text-slate-900 dark:text-white">${o.title}</h4>
                         </div>
                         <div>${getStatusBadgeHtml(o.status)}</div>
                     </div>
 
-                    <p class="text-xs text-slate-300 leading-relaxed">${o.description}</p>
+                    <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">${o.description}</p>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3.5 bg-slate-950 rounded-2xl border border-slate-800 text-xs text-slate-300">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3.5 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 text-xs text-slate-700 dark:text-slate-300">
                         <div>
-                            <span class="text-slate-500 block text-[10px] font-bold uppercase">Tukang Ditugaskan</span>
-                            <span class="font-bold text-white flex items-center gap-1.5 mt-0.5">
+                            <span class="text-slate-400 block text-[10px] font-bold uppercase">Tukang Ditugaskan</span>
+                            <span class="font-bold text-slate-900 dark:text-white flex items-center gap-1.5 mt-0.5">
                                 <i class="fa-solid fa-user-check text-amber-500"></i> ${o.worker_name}
                             </span>
                         </div>
                         <div>
-                            <span class="text-slate-500 block text-[10px] font-bold uppercase">Lokasi Proyek</span>
-                            <span class="font-bold text-slate-200 truncate block mt-0.5">${o.address}</span>
+                            <span class="text-slate-400 block text-[10px] font-bold uppercase">Lokasi Proyek</span>
+                            <span class="font-bold text-slate-800 dark:text-slate-200 truncate block mt-0.5">${o.address}</span>
                         </div>
                         <div>
-                            <span class="text-slate-500 block text-[10px] font-bold uppercase">Total Escrow</span>
-                            <span class="font-extrabold text-emerald-400 mt-0.5 block">Rp${Number(o.total_amount).toLocaleString('id-ID')}</span>
+                            <span class="text-slate-400 block text-[10px] font-bold uppercase">Total Escrow</span>
+                            <span class="font-extrabold text-emerald-600 dark:text-emerald-400 mt-0.5 block">Rp${Number(o.total_amount).toLocaleString('id-ID')}</span>
                         </div>
                     </div>
 
@@ -248,17 +275,17 @@
         function renderNearby(workers) {
             const container = document.getElementById('nearby-workers-list');
             container.innerHTML = workers.map(w => `
-                <div class="p-3 bg-slate-950 rounded-2xl border border-slate-800 flex items-center justify-between text-xs">
+                <div class="p-3 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs">
                     <div class="flex items-center gap-2.5">
-                        <img src="${w.avatar_url}" class="w-9 h-9 rounded-xl object-cover border border-slate-700">
+                        <img src="${w.avatar_url}" class="w-9 h-9 rounded-xl object-cover border border-slate-200 dark:border-slate-700">
                         <div>
-                            <p class="font-bold text-white">${w.full_name}</p>
-                            <p class="text-[10px] text-amber-400 capitalize">${w.category} • ⭐ ${w.rating_average}</p>
+                            <p class="font-bold text-slate-900 dark:text-white">${w.full_name}</p>
+                            <p class="text-[10px] text-amber-600 dark:text-amber-400 capitalize">${w.category} • ⭐ ${w.rating_average}</p>
                         </div>
                     </div>
                     <div class="text-right">
-                        <span class="px-2 py-0.5 rounded bg-blue-950 text-blue-300 font-mono font-bold text-[10px]">${w.distance_km} km</span>
-                        <p class="text-[10px] text-slate-400 mt-0.5">Rp${Number(w.daily_rate).toLocaleString('id-ID')}/hari</p>
+                        <span class="px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-mono font-bold text-[10px]">${w.distance_km} km</span>
+                        <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Rp${Number(w.daily_rate).toLocaleString('id-ID')}/hari</p>
                     </div>
                 </div>
             `).join('');

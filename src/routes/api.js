@@ -85,44 +85,180 @@ router.get('/services', (req, res) => {
 });
 
 // -------------------------------------------------------------
-// 0. AUTH REGISTER, LOGIN & PROFILE
+// 0. AUTH & OTP EMAIL SYSTEM (LOGIN / REGISTER VIA EMAIL OTP)
 // -------------------------------------------------------------
-router.post('/auth/register', async (req, res) => {
+
+// REQUEST OTP EMAIL
+router.post('/auth/request-otp', async (req, res) => {
+    try {
+        const { email, type } = req.body; // type: 'login' | 'register'
+
+        if (!email) {
+            return res.status(400).json({ success: false, message: 'Alamat email wajib diisi.' });
+        }
+
+        const cleanEmail = email.trim().toLowerCase();
+
+        // Cek user jika tipe login
+        if (type === 'login') {
+            const [users] = await pool.query('SELECT id, full_name, email FROM users WHERE email = ?', [cleanEmail]);
+            if (users.length === 0) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Email belum terdaftar. Silakan lakukan pendaftaran akun baru terlebih dahulu.'
+                });
+            }
+        }
+
+        // Cek user jika tipe register
+        if (type === 'register') {
+            const [users] = await pool.query('SELECT id FROM users WHERE email = ?', [cleanEmail]);
+            if (users.length > 0) {
+                return res.status(409).json({
+                    success: false,
+                    message: 'Email sudah terdaftar. Silakan langsung masuk di halaman login.'
+                });
+            }
+        }
+
+        // Generate 6-Digit OTP Code
+        const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+        // Nonaktifkan OTP lama yang belum terpakai untuk email ini
+        await pool.query('UPDATE email_otps SET is_used = 1 WHERE email = ?', [cleanEmail]);
+
+        // Simpan OTP baru ke MySQL (Berlaku 10 Menit)
+        await pool.query(`
+            INSERT INTO email_otps (email, otp_code, type, expires_at, is_used)
+            VALUES (?, ?, ?, NOW() + INTERVAL 10 MINUTE, 0)
+        `, [cleanEmail, otpCode, type || 'login']);
+
+        console.log(`[EMAIL OTP SERVICE] Sent OTP ${otpCode} to ${cleanEmail} for ${type}`);
+
+        res.json({
+            success: true,
+            message: `Kode OTP 6-digit berhasil dikirim ke ${cleanEmail}!`,
+            otp_preview: otpCode, // Ditampilkan untuk demo real-time
+            expires_in_minutes: 10
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Gagal mengirim OTP email', error: err.message });
+    }
+});
+
+// VERIFY OTP & LOGIN
+router.post('/auth/verify-login-otp', async (req, res) => {
+    try {
+        const { email, otp_code } = req.body;
+
+        if (!email || !otp_code) {
+            return res.status(400).json({ success: false, message: 'Email dan kode OTP wajib diisi.' });
+        }
+
+        const cleanEmail = email.trim().toLowerCase();
+        const cleanOtp = otp_code.trim();
+
+        // Validasi OTP di Database
+        const [otps] = await pool.query(`
+            SELECT * FROM email_otps 
+            WHERE email = ? AND otp_code = ? AND is_used = 0 AND expires_at >= NOW()
+            ORDER BY id DESC LIMIT 1
+        `, [cleanEmail, cleanOtp]);
+
+        if (otps.length === 0) {
+            return res.status(401).json({
+                success: false,
+                message: 'Kode OTP tidak valid atau sudah kedaluwarsa. Silakan minta kode baru.'
+            });
+        }
+
+        // Tandai OTP sebagai sudah digunakan
+        await pool.query('UPDATE email_otps SET is_used = 1 WHERE id = ?', [otps[0].id]);
+
+        // Ambil data User dari MySQL
+        const [users] = await pool.query(`
+            SELECT id, phone_number, email, full_name, avatar_url, role, kyc_status, wallet_balance 
+            FROM users WHERE email = ?
+        `, [cleanEmail]);
+
+        if (users.length === 0) {
+            return res.status(404).json({ success: false, message: 'User tidak ditemukan.' });
+        }
+
+        const user = users[0];
+
+        res.json({
+            success: true,
+            message: 'Verifikasi OTP berhasil! Selamat datang kembali.',
+            data: user
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Verifikasi OTP gagal', error: err.message });
+    }
+});
+
+// VERIFY OTP & REGISTER NEW ACCOUNT
+router.post('/auth/verify-register-otp', async (req, res) => {
     const connection = await pool.getConnection();
     await connection.beginTransaction();
 
     try {
-        const { full_name, phone_number, email, role, nik, category, daily_rate, password } = req.body;
+        const { full_name, phone_number, email, role, nik, category, daily_rate, otp_code } = req.body;
 
-        if (!full_name || !phone_number) {
+        if (!email || !otp_code || !full_name || !phone_number) {
             await connection.rollback();
             connection.release();
-            return res.status(400).json({ success: false, message: 'Nama lengkap dan nomor handphone wajib diisi.' });
+            return res.status(400).json({ success: false, message: 'Semua field dan Kode OTP wajib diisi.' });
         }
 
+        const cleanEmail = email.trim().toLowerCase();
+        const cleanOtp = otp_code.trim();
+
+        // 1. Validasi OTP di MySQL
+        const [otps] = await connection.query(`
+            SELECT * FROM email_otps 
+            WHERE email = ? AND otp_code = ? AND is_used = 0 AND expires_at >= NOW()
+            ORDER BY id DESC LIMIT 1
+        `, [cleanEmail, cleanOtp]);
+
+        if (otps.length === 0) {
+            await connection.rollback();
+            connection.release();
+            return res.status(401).json({
+                success: false,
+                message: 'Kode OTP tidak valid atau sudah kedaluwarsa. Silakan minta kode baru.'
+            });
+        }
+
+        // Tandai OTP digunakan
+        await connection.query('UPDATE email_otps SET is_used = 1 WHERE id = ?', [otps[0].id]);
+
+        // 2. Cek duplikasi
         const [existing] = await connection.query(`
-            SELECT id FROM users WHERE phone_number = ? OR (email = ? AND email IS NOT NULL AND email != '')
-        `, [phone_number, email || '']);
+            SELECT id FROM users WHERE email = ? OR phone_number = ?
+        `, [cleanEmail, phone_number]);
 
         if (existing.length > 0) {
             await connection.rollback();
             connection.release();
-            return res.status(409).json({ success: false, message: 'Nomor WhatsApp atau Email sudah terdaftar di sistem.' });
+            return res.status(409).json({ success: false, message: 'Email atau Nomor HP sudah terdaftar di sistem.' });
         }
 
         const avatar = role === 'worker' 
             ? 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150' 
             : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150';
 
-        const userPass = password || '123456';
-
+        // 3. Insert User
         const [userResult] = await connection.query(`
-            INSERT INTO users (phone_number, email, password, full_name, avatar_url, role, kyc_status, wallet_balance)
-            VALUES (?, ?, ?, ?, ?, ?, 'verified', 0.00)
-        `, [phone_number, email || null, userPass, full_name, avatar, role || 'employer']);
+            INSERT INTO users (phone_number, email, full_name, avatar_url, role, kyc_status, wallet_balance)
+            VALUES (?, ?, ?, ?, ?, 'verified', 0.00)
+        `, [phone_number, cleanEmail, full_name, avatar, role || 'employer']);
 
         const newUserId = userResult.insertId;
 
+        // 4. Insert Encrypted NIK (UU PDP)
         if (nik) {
             const encryptedNik = encryptData(nik);
             await connection.query(`
@@ -131,6 +267,7 @@ router.post('/auth/register', async (req, res) => {
             `, [newUserId, encryptedNik]);
         }
 
+        // 5. Insert Worker Profile if Worker
         if (role === 'worker') {
             await connection.query(`
                 INSERT INTO worker_profiles (user_id, category, experience_years, hourly_rate, daily_rate, current_latitude, current_longitude, is_available, rating_average, rating_count)
@@ -144,7 +281,7 @@ router.post('/auth/register', async (req, res) => {
         const newUser = {
             id: newUserId,
             phone_number,
-            email: email || null,
+            email: cleanEmail,
             full_name,
             avatar_url: avatar,
             role: role || 'employer',
@@ -154,51 +291,14 @@ router.post('/auth/register', async (req, res) => {
 
         res.json({
             success: true,
-            message: 'Pendaftaran berhasil! Data Anda tersimpan aman di database MySQL.',
+            message: 'Verifikasi OTP berhasil & Akun tersimpan permanen di database MySQL!',
             data: newUser
         });
     } catch (err) {
         await connection.rollback();
         connection.release();
         console.error(err);
-        res.status(500).json({ success: false, message: 'Gagal mendaftarkan akun', error: err.message });
-    }
-});
-
-router.post('/auth/login', async (req, res) => {
-    try {
-        const { identifier, password } = req.body;
-
-        if (!identifier || !password) {
-            return res.status(400).json({ success: false, message: 'Email/No. HP dan Password wajib diisi.' });
-        }
-
-        const [users] = await pool.query(`
-            SELECT id, phone_number, email, full_name, avatar_url, role, kyc_status, wallet_balance, password 
-            FROM users 
-            WHERE email = ? OR phone_number = ?
-        `, [identifier, identifier]);
-
-        if (users.length === 0) {
-            return res.status(401).json({ success: false, message: 'Akun dengan email/nomor HP tersebut tidak ditemukan.' });
-        }
-
-        const user = users[0];
-
-        if (user.password && user.password !== password) {
-            return res.status(401).json({ success: false, message: 'Password salah. Silakan coba lagi.' });
-        }
-
-        delete user.password;
-
-        res.json({
-            success: true,
-            message: 'Login berhasil!',
-            data: user
-        });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ success: false, message: 'Auth server error', error: err.message });
+        res.status(500).json({ success: false, message: 'Registrasi via OTP gagal', error: err.message });
     }
 });
 
@@ -580,7 +680,6 @@ router.post('/orders/:id/release-escrow', async (req, res) => {
             await connection.query('UPDATE users SET wallet_balance = wallet_balance + ? WHERE role = "admin"', [escrow.platform_cut]);
         }
 
-        // Set Garansi 14 Hari Aktif
         await connection.query(`
             UPDATE orders 
             SET status = "completed", 
@@ -622,16 +721,13 @@ router.post('/orders/:id/review', async (req, res) => {
 
         const rateVal = Math.min(5, Math.max(1, parseInt(rating) || 5));
 
-        // Update Order
         await pool.query('UPDATE orders SET rating = ?, review_comment = ? WHERE id = ?', [rateVal, comment || '', orderId]);
 
-        // Insert Review
         await pool.query(`
             INSERT INTO reviews (order_id, employer_id, worker_id, rating, comment)
             VALUES (?, ?, ?, ?, ?)
         `, [orderId, order.employer_id, order.worker_id, rateVal, comment || '']);
 
-        // Update Worker Profile Average Rating
         const [reviews] = await pool.query('SELECT AVG(rating) as avg_rating, COUNT(*) as count FROM reviews WHERE worker_id = ?', [order.worker_id]);
         if (reviews.length > 0) {
             await pool.query('UPDATE worker_profiles SET rating_average = ?, rating_count = ? WHERE user_id = ?', [

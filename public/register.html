@@ -2,18 +2,28 @@
 <html lang="id" class="h-full">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Pendaftaran Akun Baru - MitraTukang</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
+            theme: {
+                extend: {
+                    boxShadow: {
+                        'fintech': '0 10px 30px -5px rgba(0, 0, 0, 0.05), 0 4px 10px -2px rgba(0, 0, 0, 0.02)',
+                    }
+                }
+            }
         }
     </script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { 
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; 
+            -webkit-tap-highlight-color: transparent;
+        }
     </style>
     <script>
         if (localStorage.getItem('mitratukang_theme') === 'dark') {
@@ -36,7 +46,7 @@
     <div class="absolute -top-40 -left-40 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
     <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-    <div class="max-w-lg w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-2xl space-y-6 relative z-10 backdrop-blur-xl my-8 transition-colors duration-200">
+    <div class="max-w-lg w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-7 sm:p-8 shadow-2xl space-y-6 relative z-10 backdrop-blur-xl my-8 transition-colors duration-200">
         
         <!-- Header -->
         <div class="text-center space-y-2">
@@ -46,11 +56,11 @@
                 </div>
             </a>
             <h1 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Daftar Akun Baru</h1>
-            <p class="text-xs text-slate-500 dark:text-slate-400">Bergabung ke Ekosistem Jasa Konstruksi MitraTukang</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Verifikasi Langsung Menggunakan Kode OTP Email</p>
         </div>
 
-        <!-- Form Register -->
-        <form id="register-form" onsubmit="handleRegister(event)" class="space-y-4 text-xs">
+        <!-- FORM REGISTRATION DENGAN OTP EMAIL -->
+        <form id="register-form" onsubmit="handleRegisterSubmit(event)" class="space-y-4 text-xs">
             
             <!-- Pilihan Role Akun -->
             <div>
@@ -77,25 +87,31 @@
             <!-- Nama Lengkap -->
             <div>
                 <label class="block text-slate-700 dark:text-slate-300 font-bold mb-1">Nama Lengkap (Sesuai KTP)</label>
-                <input type="text" id="reg-name" required placeholder="Cth: Adit Sapari" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500">
+                <input type="text" id="reg-name" required placeholder="Cth: Adit Sapari" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500 font-medium">
             </div>
 
-            <!-- Nomor HP / WhatsApp & Email -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                    <label class="block text-slate-700 dark:text-slate-300 font-bold mb-1">No. WhatsApp (OTP)</label>
-                    <input type="tel" id="reg-phone" required placeholder="082123852983" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500">
-                </div>
-                <div>
-                    <label class="block text-slate-700 dark:text-slate-300 font-bold mb-1">Email</label>
-                    <input type="email" id="reg-email" placeholder="adhitsafary@gmail.com" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500">
-                </div>
-            </div>
-
-            <!-- Password -->
+            <!-- Email & Tombol Kirim OTP -->
             <div>
-                <label class="block text-slate-700 dark:text-slate-300 font-bold mb-1">Password</label>
-                <input type="password" id="reg-password" required value="123456" placeholder="Buat password akun" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500">
+                <label class="block text-slate-700 dark:text-slate-300 font-bold mb-1">Alamat Email Aktif (Untuk OTP)</label>
+                <div class="flex gap-2">
+                    <input type="email" id="reg-email" required placeholder="adhitsafary@gmail.com" class="flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500 font-medium">
+                    <button type="button" id="btn-reg-req-otp" onclick="requestRegisterOtp()" class="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition whitespace-nowrap">
+                        Kirim OTP
+                    </button>
+                </div>
+                <p id="reg-otp-hint" class="text-[10px] text-emerald-600 dark:text-emerald-400 font-mono mt-1 hidden"></p>
+            </div>
+
+            <!-- Input OTP 6 Digit -->
+            <div>
+                <label class="block text-slate-700 dark:text-slate-300 font-bold mb-1">Masukkan Kode OTP (6 Digit)</label>
+                <input type="text" id="reg-otp-code" required maxlength="6" placeholder="123456" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-center text-slate-900 dark:text-white font-mono font-black text-base tracking-widest focus:outline-none focus:border-amber-500">
+            </div>
+
+            <!-- Nomor HP / WhatsApp -->
+            <div>
+                <label class="block text-slate-700 dark:text-slate-300 font-bold mb-1">No. WhatsApp</label>
+                <input type="tel" id="reg-phone" required placeholder="082123852983" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500 font-medium">
             </div>
 
             <!-- NIK KTP (Enkripsi UU PDP) -->
@@ -131,14 +147,14 @@
                 </div>
             </div>
 
-            <button type="submit" id="btn-submit-reg" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/20 transition">
-                <i class="fa-solid fa-check mr-1"></i> Buat Akun & Simpan ke Database
+            <button type="submit" id="btn-submit-reg" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/20 transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-check"></i> Verifikasi OTP & Buat Akun MySQL
             </button>
         </form>
 
         <div class="text-center pt-1">
             <p class="text-xs text-slate-500 dark:text-slate-400">
-                Sudah memiliki akun? <a href="/login" class="text-amber-600 dark:text-amber-400 font-bold hover:underline">Masuk ke Portal</a>
+                Sudah memiliki akun? <a href="/login" class="text-amber-600 dark:text-amber-400 font-bold hover:underline">Masuk via OTP Email</a>
             </p>
         </div>
 
@@ -171,32 +187,69 @@
             document.getElementById('worker-extra-fields').classList.toggle('hidden', !isWorker);
         }
 
-        async function handleRegister(e) {
+        async function requestRegisterOtp() {
+            const email = document.getElementById('reg-email').value.trim();
+            if (!email) {
+                alert('Masukkan alamat email Anda terlebih dahulu.');
+                return;
+            }
+
+            const btn = document.getElementById('btn-reg-req-otp');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i>';
+
+            try {
+                const res = await fetch('/api/auth/request-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, type: 'register' })
+                });
+                const json = await res.json();
+
+                if (json.success) {
+                    const hint = document.getElementById('reg-otp-hint');
+                    hint.classList.remove('hidden');
+                    hint.innerText = `✅ OTP terkirim! (Kode Demo: ${json.otp_preview})`;
+                    document.getElementById('reg-otp-code').value = json.otp_preview;
+                    alert(`Kode OTP 6-digit berhasil dikirim ke ${email}!\nKode OTP: ${json.otp_preview}`);
+                } else {
+                    alert(`❌ ${json.message}`);
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Gagal mengirimkan kode OTP.');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Kirim OTP';
+            }
+        }
+
+        async function handleRegisterSubmit(e) {
             e.preventDefault();
             const btn = document.getElementById('btn-submit-reg');
             btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Mendaftarkan ke MySQL...';
+            btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Memverifikasi OTP & Mendaftar...';
 
             const role = document.querySelector('input[name="role"]:checked').value;
             const full_name = document.getElementById('reg-name').value.trim();
             const phone_number = document.getElementById('reg-phone').value.trim();
             const email = document.getElementById('reg-email').value.trim();
-            const password = document.getElementById('reg-password').value.trim();
             const nik = document.getElementById('reg-nik').value.trim();
+            const otp_code = document.getElementById('reg-otp-code').value.trim();
             const category = document.getElementById('reg-category')?.value;
             const daily_rate = document.getElementById('reg-daily-rate')?.value;
 
             try {
-                const res = await fetch('/api/auth/register', {
+                const res = await fetch('/api/auth/verify-register-otp', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         full_name,
                         phone_number,
                         email,
-                        password,
                         role,
                         nik,
+                        otp_code,
                         category,
                         daily_rate
                     })
@@ -205,9 +258,8 @@
                 const json = await res.json();
 
                 if (json.success) {
-                    // Simpan data user aktif di session storage
                     localStorage.setItem('mitratukang_user', JSON.stringify(json.data));
-                    alert(`✅ Pendaftaran Berhasil!\nSelamat datang, ${json.data.full_name}.\nData Anda sudah tersimpan di database MySQL & NIK dienkripsi AES-256.\n\nMengalihkan ke portal Anda...`);
+                    alert(`✅ Registrasi & Verifikasi OTP Berhasil!\nSelamat datang, ${json.data.full_name}.\nAkun Anda telah aktif di MySQL.`);
 
                     if (role === 'employer') {
                         window.location.href = '/warga';
@@ -215,15 +267,15 @@
                         window.location.href = '/tukang';
                     }
                 } else {
-                    alert(`❌ Gagal Mendaftar: ${json.message}`);
+                    alert(`❌ Gagal: ${json.message}`);
                     btn.disabled = false;
-                    btn.innerHTML = '<i class="fa-solid fa-check mr-1"></i> Buat Akun & Simpan ke Database';
+                    btn.innerHTML = '<i class="fa-solid fa-check"></i> Verifikasi OTP & Buat Akun MySQL';
                 }
             } catch (err) {
                 console.error(err);
-                alert('Terjadi kesalahan koneksi saat mendaftarkan akun.');
+                alert('Terjadi kesalahan saat memproses pendaftaran.');
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fa-solid fa-check mr-1"></i> Buat Akun & Simpan ke Database';
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> Verifikasi OTP & Buat Akun MySQL';
             }
         }
     </script>

@@ -2,18 +2,28 @@
 <html lang="id" class="h-full">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Login Masuk - MitraTukang Platform</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
+            theme: {
+                extend: {
+                    boxShadow: {
+                        'fintech': '0 10px 30px -5px rgba(0, 0, 0, 0.05), 0 4px 10px -2px rgba(0, 0, 0, 0.02)',
+                    }
+                }
+            }
         }
     </script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { 
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; 
+            -webkit-tap-highlight-color: transparent;
+        }
     </style>
     <script>
         if (localStorage.getItem('mitratukang_theme') === 'dark') {
@@ -36,7 +46,7 @@
     <div class="absolute -top-40 -left-40 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
     <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-    <div class="max-w-md w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-2xl space-y-6 relative z-10 backdrop-blur-xl transition-colors duration-200 my-8">
+    <div class="max-w-md w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-7 sm:p-8 shadow-2xl space-y-6 relative z-10 backdrop-blur-xl transition-colors duration-200 my-8">
         
         <!-- Logo & Branding -->
         <div class="text-center space-y-2">
@@ -46,64 +56,74 @@
                 </div>
             </a>
             <h1 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Mitra<span class="text-amber-500">Tukang</span></h1>
-            <p class="text-xs text-slate-500 dark:text-slate-400">Masuk ke Akun Anda untuk Mengakses Dashboard</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Masuk Cepat & Aman Menggunakan Verifikasi OTP Email</p>
         </div>
 
-        <!-- Form Login Standar -->
-        <form id="form-login" onsubmit="handleLoginSubmit(event)" class="space-y-4 text-xs">
-            
-            <!-- Email / Username / Phone -->
+        <!-- STEP 1: FORM INPUT EMAIL UNTUK REQUEST OTP -->
+        <div id="step-email-container" class="space-y-4 text-xs">
             <div>
                 <label class="block text-slate-700 dark:text-slate-300 font-bold mb-1.5">
-                    Email atau No. Handphone
+                    Alamat Email Terdaftar
                 </label>
                 <div class="relative">
                     <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
-                        <i class="fa-solid fa-user"></i>
+                        <i class="fa-solid fa-envelope"></i>
                     </span>
-                    <input type="text" id="login-identifier" required placeholder="budi.klien@gmail.com / 081234567890" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl pl-10 pr-3.5 py-3 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500 font-medium">
+                    <input type="email" id="login-email" required placeholder="adhitsafary@gmail.com / budi.klien@gmail.com" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl pl-10 pr-3.5 py-3 text-slate-900 dark:text-white font-semibold focus:outline-none focus:border-amber-500">
                 </div>
             </div>
 
-            <!-- Password -->
-            <div>
-                <div class="flex items-center justify-between mb-1.5">
-                    <label class="text-slate-700 dark:text-slate-300 font-bold">Password</label>
-                    <a href="#" onclick="alert('Default password akun demo: 123456')" class="text-amber-600 dark:text-amber-400 hover:underline text-[11px]">Lupa sandi?</a>
-                </div>
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
-                        <i class="fa-solid fa-lock"></i>
-                    </span>
-                    <input type="password" id="login-password" required value="123456" placeholder="Masukkan password" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl pl-10 pr-10 py-3 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500 font-medium">
-                    <button type="button" onclick="togglePassVisibility()" class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 hover:text-slate-600 dark:hover:text-white">
-                        <i id="pass-eye-icon" class="fa-solid fa-eye"></i>
-                    </button>
-                </div>
-            </div>
-
-            <button type="submit" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/25 transition flex items-center justify-center gap-2">
-                <i class="fa-solid fa-arrow-right-to-bracket"></i> Masuk Sekarang
+            <button type="button" id="btn-request-otp" onclick="handleRequestOtp()" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/25 transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-paper-plane"></i> Kirim Kode OTP ke Email
             </button>
-        </form>
+        </div>
+
+        <!-- STEP 2: FORM INPUT 6-DIGIT OTP (HIDDEN AWAL) -->
+        <div id="step-otp-container" class="hidden space-y-4 text-xs">
+            <div class="p-3.5 bg-amber-50 dark:bg-amber-950/40 rounded-2xl border border-amber-200 dark:border-amber-800/40 text-center space-y-1">
+                <p class="text-xs text-amber-800 dark:text-amber-300 font-bold">Kode OTP 6-Digit Telah Dikirim</p>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400" id="txt-otp-sent-target">ke email Anda</p>
+                <p class="text-[10px] text-emerald-600 dark:text-emerald-400 font-mono font-bold" id="otp-demo-hint"></p>
+            </div>
+
+            <div>
+                <label class="block text-slate-700 dark:text-slate-300 font-bold mb-1.5 text-center">
+                    Masukkan Kode OTP (6 Digit)
+                </label>
+                <input type="text" id="login-otp" maxlength="6" required placeholder="123456" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl py-3 text-center text-slate-900 dark:text-white text-xl font-black font-mono tracking-widest focus:outline-none focus:border-amber-500">
+            </div>
+
+            <button type="button" id="btn-verify-otp" onclick="handleVerifyOtp()" class="w-full py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs shadow-lg shadow-emerald-500/25 transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-circle-check"></i> Verifikasi OTP & Masuk Dashboard
+            </button>
+
+            <div class="flex justify-between items-center pt-1 text-[11px]">
+                <button type="button" onclick="resetEmailForm()" class="text-slate-500 hover:text-slate-800 dark:hover:text-white">
+                    ← Ganti Email
+                </button>
+                <button type="button" onclick="handleRequestOtp()" class="text-amber-600 dark:text-amber-400 font-bold hover:underline">
+                    Kirim Ulang Kode OTP
+                </button>
+            </div>
+        </div>
 
         <!-- Quick Demo Account Fillers -->
         <div class="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-2">
             <p class="text-[11px] font-bold text-slate-500 dark:text-slate-400 text-center uppercase tracking-wider">
-                ⚡ Akun Demo Siap Pakai:
+                ⚡ Coba Akun Demo (1-Click OTP):
             </p>
             <div class="grid grid-cols-3 gap-2">
-                <button onclick="fillDemo('budi.klien@gmail.com', '123456')" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-amber-500 text-[11px] text-center transition">
+                <button onclick="fillDemoEmail('budi.klien@gmail.com')" class="p-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-amber-500 text-[11px] text-center transition">
                     <p class="font-extrabold text-amber-600 dark:text-amber-400">Warga</p>
-                    <p class="text-[9px] text-slate-400">budi.klien</p>
+                    <p class="text-[9px] text-slate-400 truncate">budi.klien</p>
                 </button>
-                <button onclick="fillDemo('ahmad.tukang@gmail.com', '123456')" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-blue-500 text-[11px] text-center transition">
+                <button onclick="fillDemoEmail('ahmad.tukang@gmail.com')" class="p-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-blue-500 text-[11px] text-center transition">
                     <p class="font-extrabold text-blue-600 dark:text-blue-400">Tukang</p>
-                    <p class="text-[9px] text-slate-400">ahmad.tukang</p>
+                    <p class="text-[9px] text-slate-400 truncate">ahmad.tukang</p>
                 </button>
-                <button onclick="fillDemo('admin@mitratukang.id', '123456')" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 text-[11px] text-center transition">
+                <button onclick="fillDemoEmail('admin@mitratukang.id')" class="p-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 text-[11px] text-center transition">
                     <p class="font-extrabold text-emerald-600 dark:text-emerald-400">Admin</p>
-                    <p class="text-[9px] text-slate-400">admin@mitra</p>
+                    <p class="text-[9px] text-slate-400 truncate">admin@mitra</p>
                 </button>
             </div>
         </div>
@@ -131,41 +151,78 @@
         }
         updateThemeIcons();
 
-        function togglePassVisibility() {
-            const passInput = document.getElementById('login-password');
-            const eyeIcon = document.getElementById('pass-eye-icon');
-            if (passInput.type === 'password') {
-                passInput.type = 'text';
-                eyeIcon.className = 'fa-solid fa-eye-slash';
-            } else {
-                passInput.type = 'password';
-                eyeIcon.className = 'fa-solid fa-eye';
+        function fillDemoEmail(email) {
+            document.getElementById('login-email').value = email;
+            handleRequestOtp();
+        }
+
+        function resetEmailForm() {
+            document.getElementById('step-email-container').classList.remove('hidden');
+            document.getElementById('step-otp-container').classList.add('hidden');
+        }
+
+        async function handleRequestOtp() {
+            const email = document.getElementById('login-email').value.trim();
+            if (!email) {
+                alert('Silakan masukkan alamat email terlebih dahulu.');
+                return;
             }
-        }
 
-        function fillDemo(identifier, password) {
-            document.getElementById('login-identifier').value = identifier;
-            document.getElementById('login-password').value = password;
-        }
-
-        async function handleLoginSubmit(e) {
-            e.preventDefault();
-            const identifier = document.getElementById('login-identifier').value.trim();
-            const password = document.getElementById('login-password').value.trim();
+            const btn = document.getElementById('btn-request-otp');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Mengirim OTP ke MySQL...';
 
             try {
-                const res = await fetch('/api/auth/login', {
+                const res = await fetch('/api/auth/request-otp', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ identifier, password })
+                    body: JSON.stringify({ email, type: 'login' })
                 });
                 const json = await res.json();
 
                 if (json.success) {
-                    // Simpan session info
+                    document.getElementById('step-email-container').classList.add('hidden');
+                    document.getElementById('step-otp-container').classList.remove('hidden');
+                    document.getElementById('txt-otp-sent-target').innerText = `ke ${email}`;
+                    document.getElementById('otp-demo-hint').innerText = `(Kode OTP Anda: ${json.otp_preview})`;
+                    document.getElementById('login-otp').value = json.otp_preview; // Otomatis terisi untuk kemudahan testing
+                } else {
+                    alert(`❌ ${json.message}`);
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Gagal menghubungi server untuk mengirim OTP.');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Kirim Kode OTP ke Email';
+            }
+        }
+
+        async function handleVerifyOtp() {
+            const email = document.getElementById('login-email').value.trim();
+            const otp_code = document.getElementById('login-otp').value.trim();
+
+            if (!otp_code) {
+                alert('Silakan masukkan 6-digit kode OTP.');
+                return;
+            }
+
+            const btn = document.getElementById('btn-verify-otp');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Memverifikasi OTP...';
+
+            try {
+                const res = await fetch('/api/auth/verify-login-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, otp_code })
+                });
+                const json = await res.json();
+
+                if (json.success) {
                     localStorage.setItem('mitratukang_user', JSON.stringify(json.data));
-                    alert(`✅ Login Berhasil!\nSelamat datang, ${json.data.full_name} (${json.data.role.toUpperCase()}).\n\nMengalihkan ke dashboard...`);
-                    
+                    alert(`✅ Verifikasi OTP Berhasil!\nSelamat datang, ${json.data.full_name} (${json.data.role.toUpperCase()}).\n\nMengalihkan ke portal Anda...`);
+
                     if (json.data.role === 'employer') {
                         window.location.href = '/warga';
                     } else if (json.data.role === 'worker') {
@@ -176,11 +233,15 @@
                         window.location.href = '/';
                     }
                 } else {
-                    alert(`❌ Gagal Masuk: ${json.message}`);
+                    alert(`❌ ${json.message}`);
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Verifikasi OTP & Masuk Dashboard';
                 }
             } catch (err) {
                 console.error(err);
-                alert('Terjadi kesalahan saat memproses login.');
+                alert('Gagal memverifikasi OTP.');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Verifikasi OTP & Masuk Dashboard';
             }
         }
     </script>

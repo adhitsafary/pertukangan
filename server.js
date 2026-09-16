@@ -18,7 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Specific Role Dashboard & Public Routes
-app.get('/', (req, res) => {
+app.get('/landing', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'landing.html'));
 });
 
@@ -44,6 +44,11 @@ app.get('/admin', (req, res) => {
 
 // API Routes
 app.use('/api', apiRoutes);
+
+// Default Route (/) -> Menampilkan Dashboard Terpadu Interaktif (index.html)
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 // Setup 24H Auto-Release Background Cron Job (Runs every 10 minutes)
 const autoReleaseJob = new CronJob('*/10 * * * *', async () => {
@@ -82,12 +87,13 @@ const autoReleaseJob = new CronJob('*/10 * * * *', async () => {
 app.listen(PORT, '0.0.0.0', async () => {
     console.log(`=======================================================`);
     console.log(`🏗️  MitraTukang Enterprise - Production Server Active`);
-    console.log(`🌐 Landing Page: http://0.0.0.0:${PORT}/`);
-    console.log(`📝 Register:     http://0.0.0.0:${PORT}/register`);
-    console.log(`🚀 Portal Login: http://0.0.0.0:${PORT}/login`);
-    console.log(`🏠 Portal Warga: http://0.0.0.0:${PORT}/warga`);
-    console.log(`🔨 Portal Tukang: http://0.0.0.0:${PORT}/tukang`);
-    console.log(`🏛️  Portal Admin: http://0.0.0.0:${PORT}/admin`);
+    console.log(`📊 Dashboard Terpadu: http://0.0.0.0:${PORT}/`);
+    console.log(`🌐 Landing Page:     http://0.0.0.0:${PORT}/landing`);
+    console.log(`📝 Register:         http://0.0.0.0:${PORT}/register`);
+    console.log(`🚀 Portal Login:     http://0.0.0.0:${PORT}/login`);
+    console.log(`🏠 Portal Warga:     http://0.0.0.0:${PORT}/warga`);
+    console.log(`🔨 Portal Tukang:    http://0.0.0.0:${PORT}/tukang`);
+    console.log(`🏛️  Portal Admin:     http://0.0.0.0:${PORT}/admin`);
     console.log(`=======================================================`);
     
     await seedDatabase();

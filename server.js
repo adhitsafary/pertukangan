@@ -17,12 +17,29 @@ app.use(express.urlencoded({ extended: true }));
 // Serve static frontend files
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Specific Role Dashboard Routes
+app.get('/warga', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'warga.html'));
+});
+
+app.get('/tukang', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'tukang.html'));
+});
+
+app.get('/admin', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+});
+
+app.get('/login', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+
 // API Routes
 app.use('/api', apiRoutes);
 
-// Fallback to SPA index
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+// Default to Login page
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
 // Setup 24H Auto-Release Background Cron Job (Runs every 10 minutes)
@@ -62,11 +79,12 @@ const autoReleaseJob = new CronJob('*/10 * * * *', async () => {
 app.listen(PORT, '0.0.0.0', async () => {
     console.log(`=======================================================`);
     console.log(`🏗️  MitraTukang Enterprise - Production Server Active`);
-    console.log(`🚀 Host: http://0.0.0.0:${PORT}`);
-    console.log(`🗄️  Database: MySQL (mitratukang_db)`);
+    console.log(`🚀 Portal Login: http://0.0.0.0:${PORT}/login`);
+    console.log(`🏠 Portal Warga: http://0.0.0.0:${PORT}/warga`);
+    console.log(`🔨 Portal Tukang: http://0.0.0.0:${PORT}/tukang`);
+    console.log(`🏛️  Portal Admin: http://0.0.0.0:${PORT}/admin`);
     console.log(`=======================================================`);
     
-    // Seed and start background workers
     await seedDatabase();
     autoReleaseJob.start();
 });

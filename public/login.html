@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full bg-slate-950">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - MitraTukang Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
+</head>
+<body class="h-full flex flex-col justify-center items-center bg-slate-950 text-slate-100 p-4 relative overflow-hidden">
+
+    <!-- Background Glow Elements -->
+    <div class="absolute -top-40 -left-40 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+    <div class="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl space-y-6 relative z-10 backdrop-blur-xl">
+        
+        <!-- Logo & Branding -->
+        <div class="text-center space-y-2">
+            <div class="w-16 h-16 rounded-3xl bg-gradient-to-tr from-amber-600 to-amber-400 flex items-center justify-center text-slate-950 text-3xl font-black mx-auto shadow-xl shadow-amber-500/30">
+                <i class="fa-solid fa-helmet-safety"></i>
+            </div>
+            <h1 class="text-2xl font-black text-white tracking-tight">Mitra<span class="text-amber-500">Tukang</span></h1>
+            <p class="text-xs text-slate-400">Pilih Akun Role untuk Masuk ke Dashboard Khusus</p>
+        </div>
+
+        <!-- 3 Role Login Cards Selector -->
+        <div class="space-y-3">
+            
+            <!-- 1. Role Warga (Klien) -->
+            <button onclick="loginAs('warga')" class="w-full p-4 rounded-2xl bg-slate-950/80 border border-slate-800 hover:border-amber-500/60 hover:bg-slate-800/80 transition flex items-center justify-between group text-left shadow-md">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-11 h-11 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl font-bold group-hover:scale-105 transition">
+                        <i class="fa-solid fa-house-user"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-extrabold text-white group-hover:text-amber-400 transition">1. Pencari Tukang (Warga)</p>
+                        <p class="text-[11px] text-slate-400">Order tukang, bayar escrow & review hasil</p>
+                    </div>
+                </div>
+                <i class="fa-solid fa-arrow-right text-slate-500 group-hover:text-amber-400 group-hover:translate-x-1 transition text-xs"></i>
+            </button>
+
+            <!-- 2. Role Tukang (Penyedia Jasa) -->
+            <button onclick="loginAs('tukang')" class="w-full p-4 rounded-2xl bg-slate-950/80 border border-slate-800 hover:border-blue-500/60 hover:bg-slate-800/80 transition flex items-center justify-between group text-left shadow-md">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-11 h-11 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-xl font-bold group-hover:scale-105 transition">
+                        <i class="fa-solid fa-trowel-bricks"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-extrabold text-white group-hover:text-blue-400 transition">2. Dashboard Tukang Lapangan</p>
+                        <p class="text-[11px] text-slate-400">Terima kerja, check-in GPS & cairkan upah</p>
+                    </div>
+                </div>
+                <i class="fa-solid fa-arrow-right text-slate-500 group-hover:text-blue-400 group-hover:translate-x-1 transition text-xs"></i>
+            </button>
+
+            <!-- 3. Role Admin (Escrow & Penghubung) -->
+            <button onclick="loginAs('admin')" class="w-full p-4 rounded-2xl bg-slate-950/80 border border-slate-800 hover:border-emerald-500/60 hover:bg-slate-800/80 transition flex items-center justify-between group text-left shadow-md">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-11 h-11 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl font-bold group-hover:scale-105 transition">
+                        <i class="fa-solid fa-building-columns"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-extrabold text-white group-hover:text-emerald-400 transition">3. Administrator & Escrow</p>
+                        <p class="text-[11px] text-slate-400">Audit transaksi rekber, komisi & KYC</p>
+                    </div>
+                </div>
+                <i class="fa-solid fa-arrow-right text-slate-500 group-hover:text-emerald-400 group-hover:translate-x-1 transition text-xs"></i>
+            </button>
+
+        </div>
+
+        <!-- Security & Legal Notice -->
+        <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800/80 text-center">
+            <p class="text-[10px] text-slate-400">
+                <i class="fa-solid fa-lock text-emerald-400 mr-1"></i> Dilindungi Enkripsi AES-256 & Kepatuhan UU PDP No. 27/2022
+            </p>
+        </div>
+
+    </div>
+
+    <script>
+        function loginAs(role) {
+            localStorage.setItem('mitratukang_active_role', role);
+            if (role === 'warga') {
+                window.location.href = '/warga';
+            } else if (role === 'tukang') {
+                window.location.href = '/tukang';
+            } else if (role === 'admin') {
+                window.location.href = '/admin';
+            }
+        }
+    </script>
+</body>
+</html>

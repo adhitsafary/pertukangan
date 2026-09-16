@@ -80,17 +80,20 @@
 
         <!-- STEP 2: FORM INPUT 6-DIGIT OTP (HIDDEN AWAL) -->
         <div id="step-otp-container" class="hidden space-y-4 text-xs">
-            <div class="p-3.5 bg-amber-50 dark:bg-amber-950/40 rounded-2xl border border-amber-200 dark:border-amber-800/40 text-center space-y-1">
-                <p class="text-xs text-amber-800 dark:text-amber-300 font-bold">Kode OTP 6-Digit Telah Dikirim</p>
-                <p class="text-[11px] text-slate-500 dark:text-slate-400" id="txt-otp-sent-target">ke email Anda</p>
-                <p class="text-[10px] text-slate-400 mt-1">Silakan cek inbox atau folder spam email Anda.</p>
+            <div class="p-4 bg-amber-50 dark:bg-amber-950/60 rounded-2xl border border-amber-300 dark:border-amber-800 text-center space-y-1.5 shadow-sm">
+                <p class="text-xs text-amber-900 dark:text-amber-200 font-extrabold">Kode OTP Verifikasi Anda:</p>
+                <div id="badge-otp-display" class="text-3xl font-black font-mono tracking-widest text-amber-600 dark:text-amber-400 py-1 bg-white dark:bg-slate-900 rounded-xl border border-amber-200 dark:border-amber-800/80 inline-block px-4 shadow-inner">
+                    ------
+                </div>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400" id="txt-otp-sent-target">Dikirim ke email Anda</p>
+                <p class="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">Kode OTP di atas sudah diverifikasi & tersimpan di MySQL.</p>
             </div>
 
             <div>
                 <label class="block text-slate-700 dark:text-slate-300 font-bold mb-1.5 text-center">
-                    Masukkan Kode OTP (6 Digit)
+                    Konfirmasi Kode OTP di Bawah:
                 </label>
-                <input type="text" id="login-otp" maxlength="6" required placeholder="______" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl py-3 text-center text-slate-900 dark:text-white text-xl font-black font-mono tracking-widest focus:outline-none focus:border-amber-500">
+                <input type="text" id="login-otp" maxlength="6" required placeholder="123456" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl py-3 text-center text-slate-900 dark:text-white text-2xl font-black font-mono tracking-widest focus:outline-none focus:border-amber-500 shadow-inner">
             </div>
 
             <button type="button" id="btn-verify-otp" onclick="handleVerifyOtp()" class="w-full py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs shadow-lg shadow-emerald-500/25 transition flex items-center justify-center gap-2">
@@ -98,7 +101,7 @@
             </button>
 
             <div class="flex justify-between items-center pt-1 text-[11px]">
-                <button type="button" onclick="resetEmailForm()" class="text-slate-500 hover:text-slate-800 dark:hover:text-white">
+                <button type="button" onclick="resetEmailForm()" class="text-slate-500 hover:text-slate-800 dark:hover:text-white font-medium">
                     ← Ganti Email
                 </button>
                 <button type="button" onclick="handleRequestOtp()" class="text-amber-600 dark:text-amber-400 font-bold hover:underline">
@@ -157,10 +160,10 @@
                 if (json.success) {
                     document.getElementById('step-email-container').classList.add('hidden');
                     document.getElementById('step-otp-container').classList.remove('hidden');
-                    document.getElementById('txt-otp-sent-target').innerText = `ke ${email}`;
+                    document.getElementById('txt-otp-sent-target').innerText = `Dikirim ke ${email}`;
                     if (json.otp_code) {
+                        document.getElementById('badge-otp-display').innerText = json.otp_code;
                         document.getElementById('login-otp').value = json.otp_code;
-                        alert(`Kode OTP 6-Digit: ${json.otp_code}\n\n${json.message}`);
                     }
                 } else {
                     alert(`❌ ${json.message}`);

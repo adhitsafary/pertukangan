@@ -2,18 +2,32 @@
 <html lang="id" class="h-full">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard & Escrow - MitraTukang</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Admin Escrow - MitraTukang</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
+            theme: {
+                extend: {
+                    boxShadow: {
+                        'fintech': '0 10px 30px -5px rgba(0, 0, 0, 0.05), 0 4px 10px -2px rgba(0, 0, 0, 0.02)',
+                    }
+                }
+            }
         }
     </script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { 
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; 
+            -webkit-tap-highlight-color: transparent;
+        }
+        .glass-header {
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
     </style>
     <script>
         if (localStorage.getItem('mitratukang_theme') === 'dark') {
@@ -23,88 +37,97 @@
         }
     </script>
 </head>
-<body class="h-full flex flex-col bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 antialiased transition-colors duration-200">
+<body class="h-full bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased flex flex-col transition-colors duration-200 selection:bg-emerald-500 selection:text-white pb-10">
 
     <!-- Top Header -->
-    <header class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50 transition-colors duration-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            <div class="flex items-center gap-3.5">
-                <div class="w-11 h-11 rounded-2xl bg-emerald-500 flex items-center justify-center text-white text-xl font-black shadow-lg shadow-emerald-500/20">
-                    <i class="fa-solid fa-building-columns"></i>
-                </div>
-                <div>
-                    <h1 class="text-lg font-extrabold text-slate-900 dark:text-white">Administrator & Escrow Gateway</h1>
-                    <p class="text-xs text-slate-500 dark:text-slate-400">Pengelola Platform & Penengah Sengketa (Dispute)</p>
-                </div>
+    <header class="glass-header bg-white/85 dark:bg-slate-900/85 border-b border-slate-200/80 dark:border-slate-800/80 sticky top-0 z-40 transition-colors duration-200">
+        <div class="max-w-5xl mx-auto px-4 h-16 sm:h-20 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <a href="/" class="flex items-center gap-2.5">
+                    <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-600 to-emerald-400 flex items-center justify-center text-white text-lg font-black shadow-lg shadow-emerald-500/20">
+                        <i class="fa-solid fa-building-columns"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="font-extrabold text-base tracking-tight text-slate-900 dark:text-white">Mitra<span class="text-emerald-500">Tukang</span></span>
+                            <span class="text-[9px] font-black uppercase px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">Admin</span>
+                        </div>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400">Escrow Gateway & Sengketa</p>
+                    </div>
+                </a>
             </div>
 
-            <div class="flex items-center gap-3">
-                <button onclick="triggerCronJob()" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition flex items-center gap-2 shadow-lg shadow-indigo-600/30">
-                    <i class="fa-solid fa-clock-rotate-left"></i> Test Worker 24H Auto-Release
+            <div class="flex items-center gap-2">
+                <button onclick="triggerCronJob()" class="px-3 py-2 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-md">
+                    <i class="fa-solid fa-clock-rotate-left"></i> <span class="hidden sm:inline">Cron 24h</span>
                 </button>
-                <button onclick="toggleTheme()" class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-amber-400 border border-slate-200 dark:border-slate-700 flex items-center justify-center transition shadow-sm">
-                    <i class="fa-solid fa-moon theme-toggle-icon text-sm"></i>
+                <button onclick="toggleTheme()" class="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-amber-400 flex items-center justify-center border border-slate-200 dark:border-slate-700 transition" title="Toggle Tema">
+                    <i class="fa-solid fa-moon theme-toggle-icon text-xs sm:text-sm"></i>
                 </button>
-                <a href="/login" class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white text-xs font-bold transition flex items-center gap-2 border border-slate-200 dark:border-slate-700">
-                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Keluar
+                <a href="/login" class="px-3 py-2 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-rose-500/10 hover:text-rose-500 text-slate-600 dark:text-slate-400 text-xs font-bold transition flex items-center gap-1.5 border border-slate-200 dark:border-slate-700">
+                    <i class="fa-solid fa-arrow-right-from-bracket text-xs"></i>
                 </a>
             </div>
         </div>
     </header>
 
     <!-- Main Content -->
-    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+    <main class="flex-1 max-w-5xl w-full mx-auto px-4 py-5 sm:py-6 space-y-5">
         
-        <!-- Summary Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 rounded-3xl shadow-sm dark:shadow-xl transition-colors duration-200">
-                <p class="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Dana Escrow Tertampung</p>
-                <p class="text-2xl font-black text-amber-600 dark:text-amber-400 mt-1">Rp870.000</p>
-                <span class="text-[10px] text-slate-400">Dana aman di rekening penampungan</span>
+        <!-- Unified Metrics Card Grid -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-3xl shadow-fintech">
+                <p class="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Escrow Ditahan</p>
+                <h3 id="adm-holding-sum" class="text-xl sm:text-2xl font-black text-amber-600 dark:text-amber-400 mt-0.5">Rp0</h3>
+                <span class="text-[9px] text-slate-400">Rekening penampungan</span>
             </div>
-            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 rounded-3xl shadow-sm dark:shadow-xl transition-colors duration-200">
-                <p class="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Pendapatan Platform (10%)</p>
-                <p class="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1">Rp1.540.000</p>
-                <span class="text-[10px] text-slate-400">Akumulasi fee sukses transaksi</span>
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-3xl shadow-fintech">
+                <p class="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Profit Platform (10%)</p>
+                <h3 id="adm-profit-sum" class="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-0.5">Rp1.540.000</h3>
+                <span class="text-[9px] text-slate-400">Komisi sukses</span>
             </div>
-            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 rounded-3xl shadow-sm dark:shadow-xl transition-colors duration-200">
-                <p class="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Kepatuhan UU PDP (KTP)</p>
-                <p class="text-lg font-black text-blue-600 dark:text-blue-400 mt-1 flex items-center gap-1.5">
-                    <i class="fa-solid fa-lock text-sm"></i> AES-256 Valid
-                </p>
-                <span class="text-[10px] text-slate-400">Presigned Temporary URLs 10 Min</span>
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-3xl shadow-fintech">
+                <p class="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Kepatuhan UU PDP</p>
+                <h3 class="text-base sm:text-lg font-black text-blue-600 dark:text-blue-400 mt-1 flex items-center gap-1">
+                    <i class="fa-solid fa-lock text-xs"></i> AES-256
+                </h3>
+                <span class="text-[9px] text-slate-400">NIK KTP terenkripsi</span>
             </div>
-            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 rounded-3xl shadow-sm dark:shadow-xl transition-colors duration-200">
-                <p class="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Status Sengketa (Dispute)</p>
-                <p class="text-lg font-black text-emerald-600 dark:text-emerald-400 mt-1 flex items-center gap-1.5">
-                    <i class="fa-solid fa-scale-balanced text-sm"></i> 0 Tiket Aktif
-                </p>
-                <span class="text-[10px] text-slate-400">Semua pesanan berjalan lancar</span>
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-3xl shadow-fintech">
+                <p class="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Status Dispute</p>
+                <h3 class="text-base sm:text-lg font-black text-emerald-600 dark:text-emerald-400 mt-1 flex items-center gap-1">
+                    <i class="fa-solid fa-scale-balanced text-xs"></i> 0 Sengketa
+                </h3>
+                <span class="text-[9px] text-slate-400">Semua order kondusif</span>
             </div>
         </div>
 
-        <!-- Audit Table -->
-        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm dark:shadow-xl space-y-4 transition-colors duration-200">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-4">
-                <div>
-                    <h3 class="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-                        <i class="fa-solid fa-receipt text-emerald-500"></i> Audit Mutasi Rekening Bersama (Escrow Transactions)
-                    </h3>
-                    <p class="text-xs text-slate-500 dark:text-slate-400">Log transaksi MySQL realtime dan kontrol pelepasan dana.</p>
-                </div>
+        <!-- Audit Feed (Mobile-First Cards & Table View) -->
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-fintech space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                <h3 class="text-sm sm:text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+                    <i class="fa-solid fa-receipt text-emerald-500"></i> Mutasi Rekening Bersama (Escrow Transactions)
+                </h3>
+                <button onclick="loadData()" class="text-xs text-slate-400 hover:text-white"><i class="fa-solid fa-rotate"></i></button>
             </div>
 
-            <div class="overflow-x-auto">
+            <!-- Mobile Cards View -->
+            <div id="admin-orders-cards" class="space-y-3 md:hidden">
+                <!-- Dynamically populated -->
+            </div>
+
+            <!-- Desktop Table View -->
+            <div class="hidden md:block overflow-x-auto">
                 <table class="w-full text-left text-xs text-slate-700 dark:text-slate-300">
-                    <thead class="bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 font-extrabold uppercase text-[10px] tracking-wider border-b border-slate-200 dark:border-slate-800">
+                    <thead class="bg-slate-50 dark:bg-slate-950 text-slate-400 font-extrabold uppercase text-[10px] tracking-wider border-b border-slate-200 dark:border-slate-800">
                         <tr>
-                            <th class="py-3 px-4">Order Code</th>
-                            <th class="py-3 px-4">Pekerjaan</th>
-                            <th class="py-3 px-4">Pihak Terlibat</th>
-                            <th class="py-3 px-4 text-right">Nilai Escrow</th>
-                            <th class="py-3 px-4 text-right">Platform Fee</th>
-                            <th class="py-3 px-4 text-right">Hak Bersih Tukang</th>
-                            <th class="py-3 px-4 text-center">Status Escrow</th>
+                            <th class="py-3 px-3">Order Code</th>
+                            <th class="py-3 px-3">Pekerjaan</th>
+                            <th class="py-3 px-3">Pihak Terlibat</th>
+                            <th class="py-3 px-3 text-right">Nilai Escrow</th>
+                            <th class="py-3 px-3 text-right">Fee (10%)</th>
+                            <th class="py-3 px-3 text-right">Hak Tukang</th>
+                            <th class="py-3 px-3 text-center">Status</th>
                         </tr>
                     </thead>
                     <tbody id="admin-escrow-table-body" class="divide-y divide-slate-100 dark:divide-slate-800/80"></tbody>
@@ -124,20 +147,21 @@
         function updateThemeIcons() {
             const isDark = document.documentElement.classList.contains('dark');
             document.querySelectorAll('.theme-toggle-icon').forEach(icon => {
-                icon.className = isDark ? 'fa-solid fa-sun theme-toggle-icon text-amber-400 text-sm' : 'fa-solid fa-moon theme-toggle-icon text-slate-600 text-sm';
+                icon.className = isDark ? 'fa-solid fa-sun theme-toggle-icon text-amber-400 text-xs sm:text-sm' : 'fa-solid fa-moon theme-toggle-icon text-slate-600 text-xs sm:text-sm';
             });
         }
         updateThemeIcons();
 
-        let currentOrders = [];
+        let allOrders = [];
 
         async function loadData() {
             try {
                 const res = await fetch('/api/orders');
                 const json = await res.json();
                 if (json.success) {
-                    currentOrders = json.data;
-                    renderAdminView();
+                    allOrders = json.data;
+                    renderAdminMetrics();
+                    renderAdminTable();
                 }
             } catch (err) {
                 console.error(err);
@@ -146,26 +170,50 @@
 
         function getStatusBadgeHtml(status) {
             const mapping = {
-                'waiting_escrow': '<span class="px-3 py-1 rounded-full text-[11px] font-bold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30">Menunggu Pembayaran</span>',
-                'escrow_held': '<span class="px-3 py-1 rounded-full text-[11px] font-bold bg-blue-500/15 text-blue-700 dark:text-blue-300 border border-blue-500/30">Escrow Terkunci</span>',
-                'in_progress': '<span class="px-3 py-1 rounded-full text-[11px] font-bold bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border border-indigo-500/30">Sedang Dikerjakan</span>',
-                'work_submitted': '<span class="px-3 py-1 rounded-full text-[11px] font-bold bg-purple-500/15 text-purple-700 dark:text-purple-300 border border-purple-500/30">Review 24 Jam</span>',
-                'completed': '<span class="px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">Sukses / Released</span>'
+                'waiting_escrow': '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30">Menunggu Bayar</span>',
+                'escrow_held': '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-500/15 text-blue-700 dark:text-blue-400 border border-blue-500/30">Escrow Aman</span>',
+                'in_progress': '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-indigo-500/15 text-indigo-700 dark:text-indigo-400 border border-indigo-500/30">Dikerjakan</span>',
+                'work_submitted': '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-purple-500/15 text-purple-700 dark:text-purple-400 border border-purple-500/30">Review (24h)</span>',
+                'completed': '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30">Released</span>'
             };
-            return mapping[status] || `<span class="px-3 py-1 rounded-full text-xs font-bold bg-slate-200 dark:bg-slate-800">${status}</span>`;
+            return mapping[status] || `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-200">${status}</span>`;
         }
 
-        function renderAdminView() {
+        function renderAdminMetrics() {
+            const holding = allOrders
+                .filter(o => o.status === 'escrow_held' || o.status === 'in_progress' || o.status === 'work_submitted')
+                .reduce((acc, curr) => acc + curr.total_amount, 0);
+            document.getElementById('adm-holding-sum').innerText = `Rp${Number(holding).toLocaleString('id-ID')}`;
+        }
+
+        function renderAdminTable() {
+            // Mobile Cards
+            const cardContainer = document.getElementById('admin-orders-cards');
+            cardContainer.innerHTML = allOrders.map(o => `
+                <div class="p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-2 text-xs">
+                    <div class="flex justify-between items-center">
+                        <span class="font-mono font-bold text-slate-400 text-[10px]">${o.order_code}</span>
+                        <div>${getStatusBadgeHtml(o.status)}</div>
+                    </div>
+                    <p class="font-bold text-slate-900 dark:text-white">${o.title}</p>
+                    <div class="flex justify-between text-slate-500 text-[11px] pt-1 border-t border-slate-200 dark:border-slate-800">
+                        <span>${o.employer_name} ➔ ${o.worker_name}</span>
+                        <span class="font-black text-amber-600 dark:text-amber-400">Rp${Number(o.total_amount).toLocaleString('id-ID')}</span>
+                    </div>
+                </div>
+            `).join('');
+
+            // Desktop Table
             const tbody = document.getElementById('admin-escrow-table-body');
-            tbody.innerHTML = currentOrders.map(o => `
+            tbody.innerHTML = allOrders.map(o => `
                 <tr class="hover:bg-slate-50 dark:hover:bg-slate-950/40 transition">
-                    <td class="py-3.5 px-4 font-mono font-bold text-slate-500 dark:text-slate-400">${o.order_code}</td>
-                    <td class="py-3.5 px-4 font-bold text-slate-900 dark:text-white">${o.title}</td>
-                    <td class="py-3.5 px-4 text-slate-600 dark:text-slate-300">${o.employer_name} ➔ ${o.worker_name}</td>
-                    <td class="py-3.5 px-4 text-right font-extrabold text-amber-600 dark:text-amber-400">Rp${Number(o.total_amount).toLocaleString('id-ID')}</td>
-                    <td class="py-3.5 px-4 text-right font-bold text-slate-500 dark:text-slate-400">Rp${Number(o.escrow ? o.escrow.platform_cut : o.base_price * 0.1).toLocaleString('id-ID')}</td>
-                    <td class="py-3.5 px-4 text-right font-extrabold text-emerald-600 dark:text-emerald-400">Rp${Number(o.escrow ? o.escrow.worker_net_income : o.base_price * 0.9).toLocaleString('id-ID')}</td>
-                    <td class="py-3.5 px-4 text-center">${getStatusBadgeHtml(o.status)}</td>
+                    <td class="py-3 px-3 font-mono font-bold text-slate-400">${o.order_code}</td>
+                    <td class="py-3 px-3 font-bold text-slate-900 dark:text-white">${o.title}</td>
+                    <td class="py-3 px-3 text-slate-500">${o.employer_name} ➔ ${o.worker_name}</td>
+                    <td class="py-3 px-3 text-right font-extrabold text-amber-600 dark:text-amber-400">Rp${Number(o.total_amount).toLocaleString('id-ID')}</td>
+                    <td class="py-3 px-3 text-right font-bold text-slate-400">Rp${Number(o.escrow ? o.escrow.platform_cut : o.base_price * 0.1).toLocaleString('id-ID')}</td>
+                    <td class="py-3 px-3 text-right font-extrabold text-emerald-600 dark:text-emerald-400">Rp${Number(o.escrow ? o.escrow.worker_net_income : o.base_price * 0.9).toLocaleString('id-ID')}</td>
+                    <td class="py-3 px-3 text-center">${getStatusBadgeHtml(o.status)}</td>
                 </tr>
             `).join('');
         }

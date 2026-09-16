@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - MitraTukang Platform</title>
+    <title>Login Masuk - MitraTukang Platform</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -23,7 +23,7 @@
         }
     </script>
 </head>
-<body class="h-full flex flex-col justify-center items-center bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 p-4 relative overflow-hidden transition-colors duration-200">
+<body class="h-full flex flex-col justify-center items-center bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 p-4 relative overflow-y-auto transition-colors duration-200">
 
     <!-- Top Theme Toggle Floating -->
     <div class="absolute top-6 right-6 z-20">
@@ -36,7 +36,7 @@
     <div class="absolute -top-40 -left-40 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
     <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-    <div class="max-w-md w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-2xl space-y-6 relative z-10 backdrop-blur-xl transition-colors duration-200">
+    <div class="max-w-md w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-2xl space-y-6 relative z-10 backdrop-blur-xl transition-colors duration-200 my-8">
         
         <!-- Logo & Branding -->
         <div class="text-center space-y-2">
@@ -46,54 +46,66 @@
                 </div>
             </a>
             <h1 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Mitra<span class="text-amber-500">Tukang</span></h1>
-            <p class="text-xs text-slate-500 dark:text-slate-400">Pilih Role untuk Masuk ke Portal Khusus</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Masuk ke Akun Anda untuk Mengakses Dashboard</p>
         </div>
 
-        <!-- 3 Role Login Cards Selector -->
-        <div class="space-y-3">
+        <!-- Form Login Standar -->
+        <form id="form-login" onsubmit="handleLoginSubmit(event)" class="space-y-4 text-xs">
             
-            <!-- 1. Role Warga (Klien) -->
-            <button onclick="loginAs('warga')" class="w-full p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 hover:border-amber-500 hover:bg-amber-500/5 transition flex items-center justify-between group text-left shadow-sm">
-                <div class="flex items-center gap-3.5">
-                    <div class="w-11 h-11 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center text-xl font-bold group-hover:scale-105 transition">
-                        <i class="fa-solid fa-house-user"></i>
-                    </div>
-                    <div>
-                        <p class="text-sm font-extrabold text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition">1. Pencari Tukang (Warga)</p>
-                        <p class="text-[11px] text-slate-500 dark:text-slate-400">Order tukang, bayar escrow & review hasil</p>
-                    </div>
+            <!-- Email / Username / Phone -->
+            <div>
+                <label class="block text-slate-700 dark:text-slate-300 font-bold mb-1.5">
+                    Email atau No. Handphone
+                </label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                        <i class="fa-solid fa-user"></i>
+                    </span>
+                    <input type="text" id="login-identifier" required placeholder="budi.klien@gmail.com / 081234567890" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl pl-10 pr-3.5 py-3 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500 font-medium">
                 </div>
-                <i class="fa-solid fa-arrow-right text-slate-400 group-hover:text-amber-500 group-hover:translate-x-1 transition text-xs"></i>
-            </button>
+            </div>
 
-            <!-- 2. Role Tukang (Penyedia Jasa) -->
-            <button onclick="loginAs('tukang')" class="w-full p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 hover:border-blue-500 hover:bg-blue-500/5 transition flex items-center justify-between group text-left shadow-sm">
-                <div class="flex items-center gap-3.5">
-                    <div class="w-11 h-11 rounded-xl bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xl font-bold group-hover:scale-105 transition">
-                        <i class="fa-solid fa-trowel-bricks"></i>
-                    </div>
-                    <div>
-                        <p class="text-sm font-extrabold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition">2. Dashboard Tukang Lapangan</p>
-                        <p class="text-[11px] text-slate-500 dark:text-slate-400">Terima kerja, check-in GPS & cairkan upah</p>
-                    </div>
+            <!-- Password -->
+            <div>
+                <div class="flex items-center justify-between mb-1.5">
+                    <label class="text-slate-700 dark:text-slate-300 font-bold">Password</label>
+                    <a href="#" onclick="alert('Default password akun demo: 123456')" class="text-amber-600 dark:text-amber-400 hover:underline text-[11px]">Lupa sandi?</a>
                 </div>
-                <i class="fa-solid fa-arrow-right text-slate-400 group-hover:text-blue-500 group-hover:translate-x-1 transition text-xs"></i>
-            </button>
-
-            <!-- 3. Role Admin (Escrow & Penghubung) -->
-            <button onclick="loginAs('admin')" class="w-full p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 hover:bg-emerald-500/5 transition flex items-center justify-between group text-left shadow-sm">
-                <div class="flex items-center gap-3.5">
-                    <div class="w-11 h-11 rounded-xl bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xl font-bold group-hover:scale-105 transition">
-                        <i class="fa-solid fa-building-columns"></i>
-                    </div>
-                    <div>
-                        <p class="text-sm font-extrabold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition">3. Administrator & Escrow</p>
-                        <p class="text-[11px] text-slate-500 dark:text-slate-400">Audit transaksi rekber, komisi & KYC</p>
-                    </div>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                        <i class="fa-solid fa-lock"></i>
+                    </span>
+                    <input type="password" id="login-password" required value="123456" placeholder="Masukkan password" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl pl-10 pr-10 py-3 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500 font-medium">
+                    <button type="button" onclick="togglePassVisibility()" class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 hover:text-slate-600 dark:hover:text-white">
+                        <i id="pass-eye-icon" class="fa-solid fa-eye"></i>
+                    </button>
                 </div>
-                <i class="fa-solid fa-arrow-right text-slate-400 group-hover:text-emerald-500 group-hover:translate-x-1 transition text-xs"></i>
-            </button>
+            </div>
 
+            <button type="submit" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/25 transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-arrow-right-to-bracket"></i> Masuk Sekarang
+            </button>
+        </form>
+
+        <!-- Quick Demo Account Fillers -->
+        <div class="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-2">
+            <p class="text-[11px] font-bold text-slate-500 dark:text-slate-400 text-center uppercase tracking-wider">
+                ⚡ Akun Demo Siap Pakai:
+            </p>
+            <div class="grid grid-cols-3 gap-2">
+                <button onclick="fillDemo('budi.klien@gmail.com', '123456')" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-amber-500 text-[11px] text-center transition">
+                    <p class="font-extrabold text-amber-600 dark:text-amber-400">Warga</p>
+                    <p class="text-[9px] text-slate-400">budi.klien</p>
+                </button>
+                <button onclick="fillDemo('ahmad.tukang@gmail.com', '123456')" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-blue-500 text-[11px] text-center transition">
+                    <p class="font-extrabold text-blue-600 dark:text-blue-400">Tukang</p>
+                    <p class="text-[9px] text-slate-400">ahmad.tukang</p>
+                </button>
+                <button onclick="fillDemo('admin@mitratukang.id', '123456')" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 text-[11px] text-center transition">
+                    <p class="font-extrabold text-emerald-600 dark:text-emerald-400">Admin</p>
+                    <p class="text-[9px] text-slate-400">admin@mitra</p>
+                </button>
+            </div>
         </div>
 
         <div class="text-center pt-1">
@@ -119,11 +131,57 @@
         }
         updateThemeIcons();
 
-        function loginAs(role) {
-            localStorage.setItem('mitratukang_active_role', role);
-            if (role === 'warga') window.location.href = '/warga';
-            else if (role === 'tukang') window.location.href = '/tukang';
-            else if (role === 'admin') window.location.href = '/admin';
+        function togglePassVisibility() {
+            const passInput = document.getElementById('login-password');
+            const eyeIcon = document.getElementById('pass-eye-icon');
+            if (passInput.type === 'password') {
+                passInput.type = 'text';
+                eyeIcon.className = 'fa-solid fa-eye-slash';
+            } else {
+                passInput.type = 'password';
+                eyeIcon.className = 'fa-solid fa-eye';
+            }
+        }
+
+        function fillDemo(identifier, password) {
+            document.getElementById('login-identifier').value = identifier;
+            document.getElementById('login-password').value = password;
+        }
+
+        async function handleLoginSubmit(e) {
+            e.preventDefault();
+            const identifier = document.getElementById('login-identifier').value.trim();
+            const password = document.getElementById('login-password').value.trim();
+
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ identifier, password })
+                });
+                const json = await res.json();
+
+                if (json.success) {
+                    // Simpan session info
+                    localStorage.setItem('mitratukang_user', JSON.stringify(json.data));
+                    alert(`✅ Login Berhasil!\nSelamat datang, ${json.data.full_name} (${json.data.role.toUpperCase()}).\n\nMengalihkan ke dashboard...`);
+                    
+                    if (json.data.role === 'employer') {
+                        window.location.href = '/warga';
+                    } else if (json.data.role === 'worker') {
+                        window.location.href = '/tukang';
+                    } else if (json.data.role === 'admin') {
+                        window.location.href = '/admin';
+                    } else {
+                        window.location.href = '/';
+                    }
+                } else {
+                    alert(`❌ Gagal Masuk: ${json.message}`);
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Terjadi kesalahan saat memproses login.');
+            }
         }
     </script>
 </body>

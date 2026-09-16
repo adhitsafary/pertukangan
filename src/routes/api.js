@@ -5,6 +5,48 @@ const { validateGeofence, calculateHaversineDistance } = require('../services/sp
 const { encryptData, decryptData, generatePresignedUrl } = require('../services/encryptionService');
 
 // -------------------------------------------------------------
+// 0. AUTH LOGIN ENDPOINT (VERIFIKASI EMAIL/PHONE & PASSWORD)
+// -------------------------------------------------------------
+router.post('/auth/login', async (req, res) => {
+    try {
+        const { identifier, password } = req.body;
+
+        if (!identifier || !password) {
+            return res.status(400).json({ success: false, message: 'Email/No. HP dan Password wajib diisi.' });
+        }
+
+        const [users] = await pool.query(`
+            SELECT id, phone_number, email, full_name, avatar_url, role, kyc_status, wallet_balance, password 
+            FROM users 
+            WHERE email = ? OR phone_number = ?
+        `, [identifier, identifier]);
+
+        if (users.length === 0) {
+            return res.status(401).json({ success: false, message: 'Akun dengan email/nomor HP tersebut tidak ditemukan.' });
+        }
+
+        const user = users[0];
+
+        // Validasi password (default demo '123456' atau password di DB)
+        if (user.password && user.password !== password) {
+            return res.status(401).json({ success: false, message: 'Password salah. Silakan coba lagi.' });
+        }
+
+        // Hapus field password dari response
+        delete user.password;
+
+        res.json({
+            success: true,
+            message: 'Login berhasil!',
+            data: user
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Auth server error', error: err.message });
+    }
+});
+
+// -------------------------------------------------------------
 // 1. GET ALL ORDERS (WITH RELATIONAL JOINS)
 // -------------------------------------------------------------
 router.get('/orders', async (req, res) => {
@@ -116,15 +158,12 @@ router.post('/payment/webhook', async (req, res) => {
             const workerNet = order.base_price - platformCut;
             const ref = transaction_id || `PG-${Date.now()}`;
 
-            // Atomic Transaction
             const connection = await pool.getConnection();
             await connection.beginTransaction();
 
             try {
-                // Update Order Status
                 await connection.query('UPDATE orders SET status = "escrow_held", updated_at = NOW() WHERE id = ?', [order.id]);
 
-                // Insert or Update Escrow
                 const [existingEscrow] = await connection.query('SELECT * FROM escrow_transactions WHERE order_id = ?', [order.id]);
                 if (existingEscrow.length === 0) {
                     await connection.query(`
@@ -178,7 +217,6 @@ router.post('/orders/:id/start-work', async (req, res) => {
             });
         }
 
-        // Validasi Haversine < 50m
         const geoValidation = validateGeofence(
             parseFloat(worker_latitude),
             parseFloat(worker_longitude),
@@ -276,17 +314,11 @@ router.post('/orders/:id/release-escrow', async (req, res) => {
         if (escrows.length > 0 && escrows[0].status === 'holding') {
             const escrow = escrows[0];
 
-            // 1. Update Escrow status
             await connection.query('UPDATE escrow_transactions SET status = "released", released_at = NOW() WHERE id = ?', [escrow.id]);
-
-            // 2. Credit worker wallet
             await connection.query('UPDATE users SET wallet_balance = wallet_balance + ? WHERE id = ?', [escrow.worker_net_income, order.worker_id]);
-
-            // 3. Credit admin platform profit
             await connection.query('UPDATE users SET wallet_balance = wallet_balance + ? WHERE role = "admin"', [escrow.platform_cut]);
         }
 
-        // 4. Update Order to Completed
         await connection.query('UPDATE orders SET status = "completed", completed_at = NOW(), updated_at = NOW() WHERE id = ?', [orderId]);
 
         await connection.commit();

@@ -17,7 +17,19 @@ app.use(express.urlencoded({ extended: true }));
 // Serve static frontend files
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Specific Role Dashboard Routes
+// Specific Role Dashboard & Public Routes
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'landing.html'));
+});
+
+app.get('/register', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'register.html'));
+});
+
+app.get('/login', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+
 app.get('/warga', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'warga.html'));
 });
@@ -30,17 +42,8 @@ app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
-app.get('/login', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'login.html'));
-});
-
 // API Routes
 app.use('/api', apiRoutes);
-
-// Default to Login page
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'login.html'));
-});
 
 // Setup 24H Auto-Release Background Cron Job (Runs every 10 minutes)
 const autoReleaseJob = new CronJob('*/10 * * * *', async () => {
@@ -79,6 +82,8 @@ const autoReleaseJob = new CronJob('*/10 * * * *', async () => {
 app.listen(PORT, '0.0.0.0', async () => {
     console.log(`=======================================================`);
     console.log(`🏗️  MitraTukang Enterprise - Production Server Active`);
+    console.log(`🌐 Landing Page: http://0.0.0.0:${PORT}/`);
+    console.log(`📝 Register:     http://0.0.0.0:${PORT}/register`);
     console.log(`🚀 Portal Login: http://0.0.0.0:${PORT}/login`);
     console.log(`🏠 Portal Warga: http://0.0.0.0:${PORT}/warga`);
     console.log(`🔨 Portal Tukang: http://0.0.0.0:${PORT}/tukang`);

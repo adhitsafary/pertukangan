@@ -632,10 +632,23 @@
             loadData();
         }
 
-        function openPayModal(orderId, code, amount) {
+        async function openPayModal(orderId, code, amount) {
             activePayOrderId = orderId;
             document.getElementById('modal-amount-text').innerText = `Rp${Number(amount).toLocaleString('id-ID')}`;
             document.getElementById('modal-ordercode-text').innerText = `Order: ${code}`;
+
+            // Tarik gambar QRIS rekening admin dari database
+            try {
+                const res = await fetch('/api/settings/qris');
+                const json = await res.json();
+                if (json.success && json.data.qris_image_url) {
+                    const imgEl = document.querySelector('#payment-modal img');
+                    if (imgEl) imgEl.src = json.data.qris_image_url;
+                }
+            } catch (e) {
+                console.error(e);
+            }
+
             document.getElementById('payment-modal').classList.remove('hidden');
         }
 

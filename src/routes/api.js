@@ -86,6 +86,61 @@ router.get('/services', (req, res) => {
 });
 
 // -------------------------------------------------------------
+// QRIS PLATFORM SETTINGS (DYNAMIC QRIS INPUT BY ADMIN)
+// -------------------------------------------------------------
+router.get('/settings/qris', async (req, res) => {
+    try {
+        const [rows] = await pool.query('SELECT setting_key, setting_value FROM platform_settings');
+        const settings = {};
+        rows.forEach(r => {
+            settings[r.setting_key] = r.setting_value;
+        });
+
+        res.json({
+            success: true,
+            data: {
+                qris_image_url: settings.qris_image_url || 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=MITRATUKANG-QRIS-DEFAULT',
+                qris_merchant_name: settings.qris_merchant_name || 'MITRATUKANG ESCROW INDONESIA',
+                qris_nmid: settings.qris_nmid || 'ID1020000123456',
+                qris_raw_string: settings.qris_raw_string || ''
+            }
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Gagal memuat setting QRIS', error: err.message });
+    }
+});
+
+router.put('/settings/qris', async (req, res) => {
+    try {
+        const { qris_image_url, qris_merchant_name, qris_nmid, qris_raw_string } = req.body;
+
+        const updateKey = async (key, val) => {
+            if (val !== undefined) {
+                await pool.query(`
+                    INSERT INTO platform_settings (setting_key, setting_value)
+                    VALUES (?, ?)
+                    ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)
+                `, [key, val]);
+            }
+        };
+
+        await updateKey('qris_image_url', qris_image_url);
+        await updateKey('qris_merchant_name', qris_merchant_name);
+        await updateKey('qris_nmid', qris_nmid);
+        await updateKey('qris_raw_string', qris_raw_string);
+
+        res.json({
+            success: true,
+            message: 'Konfigurasi QRIS Escrow Admin berhasil diperbarui di database MySQL!'
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Gagal memperbarui QRIS', error: err.message });
+    }
+});
+
+// -------------------------------------------------------------
 // 0. AUTH & OTP EMAIL SYSTEM (MYSQL PERSISTED)
 // -------------------------------------------------------------
 router.post('/auth/request-otp', async (req, res) => {

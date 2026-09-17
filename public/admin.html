@@ -112,14 +112,17 @@
             <button onclick="switchAdminSection('escrow')" id="adm-btn-escrow" class="admin-tab-btn admin-tab-active flex-1 min-w-[140px] py-2.5 rounded-xl text-xs font-bold transition text-center flex items-center justify-center gap-2">
                 <i class="fa-solid fa-receipt"></i> 1. Audit Escrow
             </button>
+            <button onclick="switchAdminSection('qris')" id="adm-btn-qris" class="admin-tab-btn text-slate-600 dark:text-slate-400 flex-1 min-w-[140px] py-2.5 rounded-xl text-xs font-semibold transition text-center flex items-center justify-center gap-2">
+                <i class="fa-solid fa-qrcode"></i> 2. Pengaturan QRIS
+            </button>
             <button onclick="switchAdminSection('disputes')" id="adm-btn-disputes" class="admin-tab-btn text-slate-600 dark:text-slate-400 flex-1 min-w-[140px] py-2.5 rounded-xl text-xs font-semibold transition text-center flex items-center justify-center gap-2">
-                <i class="fa-solid fa-scale-balanced"></i> 2. Mediasi Sengketa
+                <i class="fa-solid fa-scale-balanced"></i> 3. Mediasi Sengketa
             </button>
             <button onclick="switchAdminSection('kyc')" id="adm-btn-kyc" class="admin-tab-btn text-slate-600 dark:text-slate-400 flex-1 min-w-[140px] py-2.5 rounded-xl text-xs font-semibold transition text-center flex items-center justify-center gap-2">
-                <i class="fa-solid fa-id-card"></i> 3. Verifikasi KYC (KTP)
+                <i class="fa-solid fa-id-card"></i> 4. Verifikasi KYC
             </button>
             <button onclick="switchAdminSection('withdrawals')" id="adm-btn-withdrawals" class="admin-tab-btn text-slate-600 dark:text-slate-400 flex-1 min-w-[140px] py-2.5 rounded-xl text-xs font-semibold transition text-center flex items-center justify-center gap-2">
-                <i class="fa-solid fa-money-bill-transfer"></i> 4. Pencairan Dompet
+                <i class="fa-solid fa-money-bill-transfer"></i> 5. Pencairan Dompet
             </button>
         </div>
 
@@ -150,6 +153,59 @@
                     </thead>
                     <tbody id="admin-escrow-table-body" class="divide-y divide-slate-100 dark:divide-slate-800/80"></tbody>
                 </table>
+            </div>
+        </section>
+
+        <!-- SECTION QRIS: KONTROL QRIS SENDIRI OLEH ADMIN -->
+        <section id="adm-sec-qris" class="hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-fintech space-y-5">
+            <div class="border-b border-slate-100 dark:border-slate-800 pb-3">
+                <h3 class="text-sm sm:text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+                    <i class="fa-solid fa-qrcode text-emerald-500"></i> Pengaturan QRIS Rekening Penampungan Sendiri
+                </h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Atur QRIS statis / dinamis milik Anda sendiri (BCA, Mandiri, BRI, ShopeePay, GoPay, Dana, dll) untuk menampung dana escrow klien.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Preview Kartu QRIS -->
+                <div class="bg-slate-50 dark:bg-slate-950 p-5 rounded-3xl border border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center text-center space-y-3">
+                    <span class="text-[10px] font-black uppercase tracking-wider text-slate-400">Preview QRIS Live (Warga)</span>
+                    <div class="p-3 bg-white rounded-2xl shadow-md border border-slate-200">
+                        <img id="preview-qris-img" src="" alt="QRIS Preview" class="w-48 h-48 object-contain rounded-xl">
+                    </div>
+                    <div>
+                        <h4 id="preview-merchant-name" class="font-black text-xs text-slate-900 dark:text-white uppercase"></h4>
+                        <p id="preview-nmid" class="font-mono text-[10px] text-slate-500"></p>
+                    </div>
+                </div>
+
+                <!-- Form Input Konfigurasi QRIS -->
+                <div class="md:col-span-2 space-y-4 text-xs">
+                    <div>
+                        <label class="block text-slate-700 dark:text-slate-300 font-bold mb-1">Nama Merchant / Rekening Bersama Escrow</label>
+                        <input type="text" id="cfg-merchant-name" placeholder="MITRATUKANG ESCROW ADIT" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-3.5 text-slate-900 dark:text-white font-semibold">
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-slate-700 dark:text-slate-300 font-bold mb-1">NMID (National Merchant ID)</label>
+                            <input type="text" id="cfg-nmid" placeholder="ID1020000123456" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-3.5 text-slate-900 dark:text-white font-mono">
+                        </div>
+                        <div>
+                            <label class="block text-slate-700 dark:text-slate-300 font-bold mb-1">URL Gambar QR Code QRIS Anda</label>
+                            <input type="url" id="cfg-qris-url" oninput="updateLivePreview()" placeholder="https://domain-anda.com/qris-adit.png" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-3.5 text-slate-900 dark:text-white">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-slate-700 dark:text-slate-300 font-bold mb-1">String QRIS / Payload Raw (Opsional untuk Generator QR Otomatis)</label>
+                        <textarea id="cfg-qris-raw" rows="3" oninput="handleRawQrisInput()" placeholder="00020101021226600016ID.CO.QRIS..." class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-3 text-slate-900 dark:text-white font-mono text-[11px]"></textarea>
+                        <span class="text-[10px] text-slate-400">Jika Anda memasukkan teks kode QRIS di sini, sistem otomatis meng-generate gambar barcode QRIS.</span>
+                    </div>
+
+                    <button onclick="saveQrisSettings()" class="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/25">
+                        <i class="fa-solid fa-floppy-disk"></i> Simpan Konfigurasi QRIS ke Database
+                    </button>
+                </div>
             </div>
         </section>
 
@@ -264,13 +320,78 @@
             document.getElementById(`adm-btn-${sec}`).className = 'admin-tab-btn admin-tab-active flex-1 min-w-[140px] py-2.5 rounded-xl text-xs font-bold transition text-center flex items-center justify-center gap-2';
 
             document.getElementById('adm-sec-escrow').classList.toggle('hidden', sec !== 'escrow');
+            document.getElementById('adm-sec-qris').classList.toggle('hidden', sec !== 'qris');
             document.getElementById('adm-sec-disputes').classList.toggle('hidden', sec !== 'disputes');
             document.getElementById('adm-sec-kyc').classList.toggle('hidden', sec !== 'kyc');
             document.getElementById('adm-sec-withdrawals').classList.toggle('hidden', sec !== 'withdrawals');
 
+            if (sec === 'qris') loadQrisSettings();
             if (sec === 'disputes') loadDisputes();
             if (sec === 'kyc') loadKycs();
             if (sec === 'withdrawals') loadWithdrawals();
+        }
+
+        async function loadQrisSettings() {
+            try {
+                const res = await fetch('/api/settings/qris');
+                const json = await res.json();
+                if (json.success) {
+                    const d = json.data;
+                    document.getElementById('cfg-merchant-name').value = d.qris_merchant_name || '';
+                    document.getElementById('cfg-nmid').value = d.qris_nmid || '';
+                    document.getElementById('cfg-qris-url').value = d.qris_image_url || '';
+                    document.getElementById('cfg-qris-raw').value = d.qris_raw_string || '';
+
+                    updateLivePreview();
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function updateLivePreview() {
+            const name = document.getElementById('cfg-merchant-name').value || 'MITRATUKANG ESCROW';
+            const nmid = document.getElementById('cfg-nmid').value || 'ID1020000123456';
+            const url = document.getElementById('cfg-qris-url').value || 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=MITRATUKANG-QRIS';
+
+            document.getElementById('preview-merchant-name').innerText = name;
+            document.getElementById('preview-nmid').innerText = `NMID: ${nmid}`;
+            document.getElementById('preview-qris-img').src = url;
+        }
+
+        function handleRawQrisInput() {
+            const raw = document.getElementById('cfg-qris-raw').value.trim();
+            if (raw) {
+                const generatedUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(raw)}`;
+                document.getElementById('cfg-qris-url').value = generatedUrl;
+                updateLivePreview();
+            }
+        }
+
+        async function saveQrisSettings() {
+            const qris_merchant_name = document.getElementById('cfg-merchant-name').value;
+            const qris_nmid = document.getElementById('cfg-nmid').value;
+            const qris_image_url = document.getElementById('cfg-qris-url').value;
+            const qris_raw_string = document.getElementById('cfg-qris-raw').value;
+
+            try {
+                const res = await fetch('/api/settings/qris', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        qris_merchant_name,
+                        qris_nmid,
+                        qris_image_url,
+                        qris_raw_string
+                    })
+                });
+                const json = await res.json();
+                alert(json.message);
+                updateLivePreview();
+            } catch (err) {
+                console.error(err);
+                alert('Gagal menyimpan QRIS.');
+            }
         }
 
         async function loadData() {

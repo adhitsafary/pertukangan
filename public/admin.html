@@ -145,10 +145,10 @@
                             <th class="py-3 px-3">Order Code</th>
                             <th class="py-3 px-3">Pekerjaan</th>
                             <th class="py-3 px-3">Pihak Terlibat</th>
-                            <th class="py-3 px-3 text-right">Nilai Escrow</th>
-                            <th class="py-3 px-3 text-right">Fee Platform (10%)</th>
-                            <th class="py-3 px-3 text-right">Hak Bersih Tukang</th>
-                            <th class="py-3 px-3 text-center">Status</th>
+                            <th class="py-3 px-3 text-right whitespace-nowrap">Nilai Escrow</th>
+                            <th class="py-3 px-3 text-right whitespace-nowrap">Fee (10%)</th>
+                            <th class="py-3 px-3 text-right whitespace-nowrap">Hak Bersih</th>
+                            <th class="py-3 px-3 text-center whitespace-nowrap">Status Escrow</th>
                         </tr>
                     </thead>
                     <tbody id="admin-escrow-table-body" class="divide-y divide-slate-100 dark:divide-slate-800/80"></tbody>
@@ -415,16 +415,16 @@
 
         function getStatusBadgeHtml(status) {
             const mapping = {
-                'waiting_escrow': '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30">Menunggu Bayar</span>',
-                'escrow_held': '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-500/15 text-blue-700 dark:text-blue-400 border border-blue-500/30">Escrow Aman</span>',
-                'in_progress': '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-indigo-500/15 text-indigo-700 dark:text-indigo-400 border border-indigo-500/30">Dikerjakan</span>',
-                'work_submitted': '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-purple-500/15 text-purple-700 dark:text-purple-400 border border-purple-500/30">Review (24h)</span>',
-                'completed': '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30">Released</span>',
-                'in_dispute': '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-500/15 text-rose-700 dark:text-rose-400 border border-rose-500/30 animate-pulse">Sengketa (Dispute)</span>',
-                'refunded': '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-500/15 text-slate-700 dark:text-slate-400 border border-slate-500/30">Refunded</span>',
-                'cancelled': '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-500/15 text-slate-700 dark:text-slate-400 border border-slate-500/30">Cancelled</span>'
+                'waiting_escrow': '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-extrabold whitespace-nowrap bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30"><i class="fa-solid fa-hourglass-start text-[9px]"></i> Menunggu Bayar</span>',
+                'escrow_held': '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-extrabold whitespace-nowrap bg-blue-500/15 text-blue-700 dark:text-blue-400 border border-blue-500/30"><i class="fa-solid fa-shield-halved text-[9px]"></i> Escrow Aman</span>',
+                'in_progress': '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-extrabold whitespace-nowrap bg-indigo-500/15 text-indigo-700 dark:text-indigo-400 border border-indigo-500/30"><i class="fa-solid fa-person-digging text-[9px]"></i> Dikerjakan</span>',
+                'work_submitted': '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-extrabold whitespace-nowrap bg-purple-500/15 text-purple-700 dark:text-purple-400 border border-purple-500/30"><i class="fa-solid fa-clipboard-check text-[9px]"></i> Review (24 Jam)</span>',
+                'completed': '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-extrabold whitespace-nowrap bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30"><i class="fa-solid fa-circle-check text-[9px]"></i> Dana Cair</span>',
+                'in_dispute': '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-extrabold whitespace-nowrap bg-rose-500/15 text-rose-700 dark:text-rose-400 border border-rose-500/30 animate-pulse"><i class="fa-solid fa-scale-balanced text-[9px]"></i> Sengketa</span>',
+                'refunded': '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-extrabold whitespace-nowrap bg-slate-500/15 text-slate-700 dark:text-slate-400 border border-slate-500/30"><i class="fa-solid fa-arrow-rotate-left text-[9px]"></i> Refunded</span>',
+                'cancelled': '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-extrabold whitespace-nowrap bg-slate-500/15 text-slate-700 dark:text-slate-400 border border-slate-500/30"><i class="fa-solid fa-ban text-[9px]"></i> Cancelled</span>'
             };
-            return mapping[status] || `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-200">${status}</span>`;
+            return mapping[status] || `<span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold whitespace-nowrap bg-slate-200 dark:bg-slate-800">${status}</span>`;
         }
 
         function renderAdminMetrics(adminUser) {

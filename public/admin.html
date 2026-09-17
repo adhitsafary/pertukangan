@@ -28,6 +28,11 @@
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
         }
+        .admin-tab-active {
+            background: #10b981;
+            color: #ffffff;
+            font-weight: 800;
+        }
     </style>
     <script>
         if (localStorage.getItem('mitratukang_theme') === 'dark') {
@@ -37,11 +42,11 @@
         }
     </script>
 </head>
-<body class="h-full bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased flex flex-col transition-colors duration-200 selection:bg-emerald-500 selection:text-white pb-10">
+<body class="h-full bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased flex flex-col transition-colors duration-200 selection:bg-emerald-500 selection:text-white pb-12">
 
     <!-- Top Header -->
     <header class="glass-header bg-white/85 dark:bg-slate-900/85 border-b border-slate-200/80 dark:border-slate-800/80 sticky top-0 z-40 transition-colors duration-200">
-        <div class="max-w-5xl mx-auto px-4 h-16 sm:h-20 flex items-center justify-between">
+        <div class="max-w-6xl mx-auto px-4 h-16 sm:h-20 flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <a href="/" class="flex items-center gap-2.5">
                     <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-600 to-emerald-400 flex items-center justify-center text-white text-lg font-black shadow-lg shadow-emerald-500/20">
@@ -50,20 +55,17 @@
                     <div>
                         <div class="flex items-center gap-1.5">
                             <span class="font-extrabold text-base tracking-tight text-slate-900 dark:text-white">Mitra<span class="text-emerald-500">Tukang</span></span>
-                            <span class="text-[9px] font-black uppercase px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">Admin</span>
+                            <span class="text-[9px] font-black uppercase px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">Admin Platform</span>
                         </div>
-                        <p class="text-[11px] text-slate-500 dark:text-slate-400">Escrow Gateway & Sengketa</p>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400">Escrow Gateway, Sengketa & KYC</p>
                     </div>
                 </a>
             </div>
 
             <div class="flex items-center gap-2">
-                <a href="/profile" class="px-3 py-2 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold transition flex items-center gap-1.5 border border-slate-200 dark:border-slate-700" title="Profil">
+                <a href="/profile" class="px-3 py-2 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold transition flex items-center gap-1.5 border border-slate-200 dark:border-slate-700">
                     <i class="fa-solid fa-circle-user text-emerald-500"></i> <span class="hidden sm:inline">Profil</span>
                 </a>
-                <button onclick="triggerCronJob()" class="px-3 py-2 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-md">
-                    <i class="fa-solid fa-clock-rotate-left"></i> <span class="hidden sm:inline">Cron 24h</span>
-                </button>
                 <button onclick="toggleTheme()" class="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-amber-400 flex items-center justify-center border border-slate-200 dark:border-slate-700 transition" title="Toggle Tema">
                     <i class="fa-solid fa-moon theme-toggle-icon text-xs sm:text-sm"></i>
                 </button>
@@ -75,52 +77,65 @@
     </header>
 
     <!-- Main Content -->
-    <main class="flex-1 max-w-5xl w-full mx-auto px-4 py-5 sm:py-6 space-y-5">
+    <main class="flex-1 max-w-6xl w-full mx-auto px-4 py-5 sm:py-6 space-y-6">
         
         <!-- Unified Metrics Card Grid -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
-            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-3xl shadow-fintech">
-                <p class="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Escrow Ditahan</p>
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 sm:p-5 rounded-3xl shadow-fintech">
+                <p class="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Escrow Tertampung</p>
                 <h3 id="adm-holding-sum" class="text-xl sm:text-2xl font-black text-amber-600 dark:text-amber-400 mt-0.5">Rp0</h3>
-                <span class="text-[9px] text-slate-400">Rekening penampungan</span>
+                <span class="text-[9px] text-slate-400">Rekening penampungan aman</span>
             </div>
-            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-3xl shadow-fintech">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 sm:p-5 rounded-3xl shadow-fintech">
                 <p class="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Profit Platform (10%)</p>
-                <h3 id="adm-profit-sum" class="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-0.5">Rp1.540.000</h3>
-                <span class="text-[9px] text-slate-400">Komisi sukses</span>
+                <h3 id="adm-profit-sum" class="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-0.5">Rp0</h3>
+                <span class="text-[9px] text-slate-400">Akumulasi komisi sukses</span>
             </div>
-            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-3xl shadow-fintech">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 sm:p-5 rounded-3xl shadow-fintech">
                 <p class="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Kepatuhan UU PDP</p>
-                <h3 class="text-base sm:text-lg font-black text-blue-600 dark:text-blue-400 mt-1 flex items-center gap-1">
-                    <i class="fa-solid fa-lock text-xs"></i> AES-256
+                <h3 class="text-sm sm:text-base font-black text-blue-600 dark:text-blue-400 mt-1 flex items-center gap-1">
+                    <i class="fa-solid fa-lock text-xs"></i> AES-256 Valid
                 </h3>
-                <span class="text-[9px] text-slate-400">NIK KTP terenkripsi</span>
+                <span class="text-[9px] text-slate-400">Presigned Temporary URLs</span>
             </div>
-            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-3xl shadow-fintech">
-                <p class="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Status Dispute</p>
-                <h3 class="text-base sm:text-lg font-black text-emerald-600 dark:text-emerald-400 mt-1 flex items-center gap-1">
-                    <i class="fa-solid fa-scale-balanced text-xs"></i> 0 Sengketa
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 sm:p-5 rounded-3xl shadow-fintech">
+                <p class="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Tiket Sengketa</p>
+                <h3 id="adm-dispute-count" class="text-sm sm:text-base font-black text-rose-600 dark:text-rose-400 mt-1 flex items-center gap-1">
+                    <i class="fa-solid fa-scale-balanced text-xs"></i> 0 Tiket
                 </h3>
-                <span class="text-[9px] text-slate-400">Semua order kondusif</span>
+                <span class="text-[9px] text-slate-400">Perlu mediasi admin</span>
             </div>
         </div>
 
-        <!-- Audit Feed (Mobile-First Cards & Table View) -->
-        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-fintech space-y-4">
+        <!-- Segmented Navigation Menu for Admin Management Sections -->
+        <div class="bg-white dark:bg-slate-900 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-2 overflow-x-auto no-scrollbar">
+            <button onclick="switchAdminSection('escrow')" id="adm-btn-escrow" class="admin-tab-btn admin-tab-active flex-1 min-w-[140px] py-2.5 rounded-xl text-xs font-bold transition text-center flex items-center justify-center gap-2">
+                <i class="fa-solid fa-receipt"></i> 1. Audit Escrow
+            </button>
+            <button onclick="switchAdminSection('disputes')" id="adm-btn-disputes" class="admin-tab-btn text-slate-600 dark:text-slate-400 flex-1 min-w-[140px] py-2.5 rounded-xl text-xs font-semibold transition text-center flex items-center justify-center gap-2">
+                <i class="fa-solid fa-scale-balanced"></i> 2. Mediasi Sengketa
+            </button>
+            <button onclick="switchAdminSection('kyc')" id="adm-btn-kyc" class="admin-tab-btn text-slate-600 dark:text-slate-400 flex-1 min-w-[140px] py-2.5 rounded-xl text-xs font-semibold transition text-center flex items-center justify-center gap-2">
+                <i class="fa-solid fa-id-card"></i> 3. Verifikasi KYC (KTP)
+            </button>
+            <button onclick="switchAdminSection('withdrawals')" id="adm-btn-withdrawals" class="admin-tab-btn text-slate-600 dark:text-slate-400 flex-1 min-w-[140px] py-2.5 rounded-xl text-xs font-semibold transition text-center flex items-center justify-center gap-2">
+                <i class="fa-solid fa-money-bill-transfer"></i> 4. Pencairan Dompet
+            </button>
+        </div>
+
+        <!-- SECTION 1: AUDIT ESCROW MUTATION -->
+        <section id="adm-sec-escrow" class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-fintech space-y-4">
             <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-                <h3 class="text-sm sm:text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
-                    <i class="fa-solid fa-receipt text-emerald-500"></i> Mutasi Rekening Bersama (Escrow Transactions)
-                </h3>
-                <button onclick="loadData()" class="text-xs text-slate-400 hover:text-white"><i class="fa-solid fa-rotate"></i></button>
+                <div>
+                    <h3 class="text-sm sm:text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+                        <i class="fa-solid fa-receipt text-emerald-500"></i> Mutasi Rekening Bersama (Escrow Transactions)
+                    </h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Log transaksi MySQL realtime dan kontrol penahanan dana.</p>
+                </div>
+                <button onclick="loadData()" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs text-slate-500 hover:text-slate-900 dark:hover:text-white"><i class="fa-solid fa-rotate"></i></button>
             </div>
 
-            <!-- Mobile Cards View -->
-            <div id="admin-orders-cards" class="space-y-3 md:hidden">
-                <!-- Dynamically populated -->
-            </div>
-
-            <!-- Desktop Table View -->
-            <div class="hidden md:block overflow-x-auto">
+            <div class="overflow-x-auto">
                 <table class="w-full text-left text-xs text-slate-700 dark:text-slate-300">
                     <thead class="bg-slate-50 dark:bg-slate-950 text-slate-400 font-extrabold uppercase text-[10px] tracking-wider border-b border-slate-200 dark:border-slate-800">
                         <tr>
@@ -128,17 +143,101 @@
                             <th class="py-3 px-3">Pekerjaan</th>
                             <th class="py-3 px-3">Pihak Terlibat</th>
                             <th class="py-3 px-3 text-right">Nilai Escrow</th>
-                            <th class="py-3 px-3 text-right">Fee (10%)</th>
-                            <th class="py-3 px-3 text-right">Hak Tukang</th>
+                            <th class="py-3 px-3 text-right">Fee Platform (10%)</th>
+                            <th class="py-3 px-3 text-right">Hak Bersih Tukang</th>
                             <th class="py-3 px-3 text-center">Status</th>
                         </tr>
                     </thead>
                     <tbody id="admin-escrow-table-body" class="divide-y divide-slate-100 dark:divide-slate-800/80"></tbody>
                 </table>
             </div>
-        </div>
+        </section>
+
+        <!-- SECTION 2: MEDIASI SENGKETA / DISPUTE RESOLUTION -->
+        <section id="adm-sec-disputes" class="hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-fintech space-y-4">
+            <div class="border-b border-slate-100 dark:border-slate-800 pb-3">
+                <h3 class="text-sm sm:text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+                    <i class="fa-solid fa-scale-balanced text-rose-500"></i> Meja Mediasi Sengketa (Dispute Resolution Desk)
+                </h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Admin memiliki otoritas membagi split dana atau refund penuh sesuai bukti lapangan.</p>
+            </div>
+
+            <div id="admin-disputes-feed" class="space-y-3.5">
+                <!-- Loaded Dynamically -->
+            </div>
+        </section>
+
+        <!-- SECTION 3: VERIFIKASI KYC KTP (UU PDP COMPLIANCE) -->
+        <section id="adm-sec-kyc" class="hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-fintech space-y-4">
+            <div class="border-b border-slate-100 dark:border-slate-800 pb-3">
+                <h3 class="text-sm sm:text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+                    <i class="fa-solid fa-id-card text-blue-500"></i> Verifikasi Identitas KTP Pengguna (KYC Verification)
+                </h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Dekripsi NIK aman dari AES-256 database & foto presigned temporary URL 10 menit.</p>
+            </div>
+
+            <div id="admin-kyc-feed" class="space-y-3.5">
+                <!-- Loaded Dynamically -->
+            </div>
+        </section>
+
+        <!-- SECTION 4: PENCAIRAN SALDO DOMPET TUKANG -->
+        <section id="adm-sec-withdrawals" class="hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-fintech space-y-4">
+            <div class="border-b border-slate-100 dark:border-slate-800 pb-3">
+                <h3 class="text-sm sm:text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+                    <i class="fa-solid fa-money-bill-transfer text-emerald-500"></i> Riwayat Pencairan Dompet Tukang (Payout Requests)
+                </h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Daftar transfer saldo penghasilan bersih ke rekening bank mitra terverifikasi.</p>
+            </div>
+
+            <div id="admin-withdrawals-feed" class="space-y-3.5">
+                <!-- Loaded Dynamically -->
+            </div>
+        </section>
 
     </main>
+
+    <!-- DISPUTE RESOLUTION MODAL -->
+    <div id="modal-resolve-dispute" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 max-w-md w-full rounded-3xl p-6 space-y-4 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                <h4 class="font-extrabold text-slate-900 dark:text-white text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-gavel text-rose-500"></i> Eksekusi Resolusi Sengketa
+                </h4>
+                <button onclick="closeDisputeModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-slate-700 dark:text-slate-300 font-bold mb-1">Keputusan Eksekusi Dana Escrow:</label>
+                    <select id="disp-res-type" onchange="toggleSplitInput()" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-slate-900 dark:text-white font-semibold">
+                        <option value="resolved_split">1. Split Dana Persentase (Proporsional)</option>
+                        <option value="resolved_worker_won">2. Menangkan Tukang (Cairkan Penuh ke Tukang)</option>
+                        <option value="resolved_employer_won">3. Menangkan Klien (Refund Penuh ke Klien)</option>
+                    </select>
+                </div>
+
+                <div id="box-split-percent" class="grid grid-cols-2 gap-3 p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800">
+                    <div>
+                        <label class="block text-slate-600 dark:text-slate-400 font-bold mb-1">% Hak Tukang</label>
+                        <input type="number" id="disp-worker-pct" value="40" oninput="adjustSplitPct('worker')" class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg p-2 text-slate-900 dark:text-white font-bold text-center">
+                    </div>
+                    <div>
+                        <label class="block text-slate-600 dark:text-slate-400 font-bold mb-1">% Refund Klien</label>
+                        <input type="number" id="disp-employer-pct" value="60" oninput="adjustSplitPct('employer')" class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg p-2 text-slate-900 dark:text-white font-bold text-center">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-slate-700 dark:text-slate-300 font-bold mb-1">Catatan Mediasi Admin</label>
+                    <textarea id="disp-notes" rows="2" placeholder="40% upah material terpasang ke tukang, 60% refund sisa renovasi ke klien." class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-slate-900 dark:text-white"></textarea>
+                </div>
+
+                <button onclick="submitResolveDispute()" class="w-full py-3.5 rounded-2xl bg-rose-600 hover:bg-rose-500 text-white font-black text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-rose-600/25">
+                    <i class="fa-solid fa-gavel"></i> Eksekusi Pelepasan & Refund Dana
+                </button>
+            </div>
+        </div>
+    </div>
 
     <script>
         function toggleTheme() {
@@ -156,14 +255,36 @@
         updateThemeIcons();
 
         let allOrders = [];
+        let activeDisputeId = null;
+
+        function switchAdminSection(sec) {
+            document.querySelectorAll('.admin-tab-btn').forEach(b => {
+                b.className = 'admin-tab-btn text-slate-600 dark:text-slate-400 flex-1 min-w-[140px] py-2.5 rounded-xl text-xs font-semibold transition text-center flex items-center justify-center gap-2';
+            });
+            document.getElementById(`adm-btn-${sec}`).className = 'admin-tab-btn admin-tab-active flex-1 min-w-[140px] py-2.5 rounded-xl text-xs font-bold transition text-center flex items-center justify-center gap-2';
+
+            document.getElementById('adm-sec-escrow').classList.toggle('hidden', sec !== 'escrow');
+            document.getElementById('adm-sec-disputes').classList.toggle('hidden', sec !== 'disputes');
+            document.getElementById('adm-sec-kyc').classList.toggle('hidden', sec !== 'kyc');
+            document.getElementById('adm-sec-withdrawals').classList.toggle('hidden', sec !== 'withdrawals');
+
+            if (sec === 'disputes') loadDisputes();
+            if (sec === 'kyc') loadKycs();
+            if (sec === 'withdrawals') loadWithdrawals();
+        }
 
         async function loadData() {
             try {
-                const res = await fetch('/api/orders');
-                const json = await res.json();
-                if (json.success) {
-                    allOrders = json.data;
-                    renderAdminMetrics();
+                const [ordersRes, adminUserRes] = await Promise.all([
+                    fetch('/api/orders'),
+                    fetch('/api/auth/profile/3') // Admin user ID 3
+                ]);
+                const ordersJson = await ordersRes.json();
+                const adminJson = await adminUserRes.json();
+
+                if (ordersJson.success) {
+                    allOrders = ordersJson.data;
+                    renderAdminMetrics(adminJson.data);
                     renderAdminTable();
                 }
             } catch (err) {
@@ -177,36 +298,29 @@
                 'escrow_held': '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-500/15 text-blue-700 dark:text-blue-400 border border-blue-500/30">Escrow Aman</span>',
                 'in_progress': '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-indigo-500/15 text-indigo-700 dark:text-indigo-400 border border-indigo-500/30">Dikerjakan</span>',
                 'work_submitted': '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-purple-500/15 text-purple-700 dark:text-purple-400 border border-purple-500/30">Review (24h)</span>',
-                'completed': '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30">Released</span>'
+                'completed': '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30">Released</span>',
+                'in_dispute': '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-500/15 text-rose-700 dark:text-rose-400 border border-rose-500/30 animate-pulse">Sengketa (Dispute)</span>',
+                'refunded': '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-500/15 text-slate-700 dark:text-slate-400 border border-slate-500/30">Refunded</span>',
+                'cancelled': '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-500/15 text-slate-700 dark:text-slate-400 border border-slate-500/30">Cancelled</span>'
             };
             return mapping[status] || `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-200">${status}</span>`;
         }
 
-        function renderAdminMetrics() {
+        function renderAdminMetrics(adminUser) {
             const holding = allOrders
-                .filter(o => o.status === 'escrow_held' || o.status === 'in_progress' || o.status === 'work_submitted')
+                .filter(o => o.status === 'escrow_held' || o.status === 'in_progress' || o.status === 'work_submitted' || o.status === 'in_dispute')
                 .reduce((acc, curr) => acc + curr.total_amount, 0);
             document.getElementById('adm-holding-sum').innerText = `Rp${Number(holding).toLocaleString('id-ID')}`;
+
+            if (adminUser) {
+                document.getElementById('adm-profit-sum').innerText = `Rp${Number(adminUser.wallet_balance || 0).toLocaleString('id-ID')}`;
+            }
+
+            const disputeCount = allOrders.filter(o => o.status === 'in_dispute').length;
+            document.getElementById('adm-dispute-count').innerHTML = `<i class="fa-solid fa-scale-balanced text-xs"></i> ${disputeCount} Sengketa`;
         }
 
         function renderAdminTable() {
-            // Mobile Cards
-            const cardContainer = document.getElementById('admin-orders-cards');
-            cardContainer.innerHTML = allOrders.map(o => `
-                <div class="p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-2 text-xs">
-                    <div class="flex justify-between items-center">
-                        <span class="font-mono font-bold text-slate-400 text-[10px]">${o.order_code}</span>
-                        <div>${getStatusBadgeHtml(o.status)}</div>
-                    </div>
-                    <p class="font-bold text-slate-900 dark:text-white">${o.title}</p>
-                    <div class="flex justify-between text-slate-500 text-[11px] pt-1 border-t border-slate-200 dark:border-slate-800">
-                        <span>${o.employer_name} ➔ ${o.worker_name}</span>
-                        <span class="font-black text-amber-600 dark:text-amber-400">Rp${Number(o.total_amount).toLocaleString('id-ID')}</span>
-                    </div>
-                </div>
-            `).join('');
-
-            // Desktop Table
             const tbody = document.getElementById('admin-escrow-table-body');
             tbody.innerHTML = allOrders.map(o => `
                 <tr class="hover:bg-slate-50 dark:hover:bg-slate-950/40 transition">
@@ -219,6 +333,197 @@
                     <td class="py-3 px-3 text-center">${getStatusBadgeHtml(o.status)}</td>
                 </tr>
             `).join('');
+        }
+
+        async function loadDisputes() {
+            try {
+                const res = await fetch('/api/admin/disputes');
+                const json = await res.json();
+                const container = document.getElementById('admin-disputes-feed');
+
+                if (json.data.length === 0) {
+                    container.innerHTML = `
+                        <div class="p-8 bg-slate-50 dark:bg-slate-950 rounded-2xl text-center text-xs text-slate-500">
+                            <i class="fa-solid fa-shield-check text-emerald-500 text-3xl mb-2"></i>
+                            <p class="font-bold">Tidak Ada Tiket Sengketa Aktif</p>
+                            <p class="text-[11px] text-slate-400">Semua pesanan berjalan aman dengan jaminan rekening bersama.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = json.data.map(d => `
+                    <div class="p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3 text-xs">
+                        <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-2">
+                            <div>
+                                <span class="font-mono font-bold text-rose-500">Tiket #${d.id} • Order: ${d.order_code}</span>
+                                <p class="font-black text-slate-900 dark:text-white text-sm mt-0.5">${d.order_title}</p>
+                            </div>
+                            <span class="px-2.5 py-1 rounded-full font-bold uppercase text-[10px] ${d.status === 'open' ? 'bg-rose-500/20 text-rose-500' : 'bg-emerald-500/20 text-emerald-500'}">${d.status}</span>
+                        </div>
+
+                        <div class="p-3 bg-white dark:bg-slate-900 rounded-xl space-y-1">
+                            <span class="text-slate-400 font-bold block text-[10px]">Alasan Sengketa:</span>
+                            <p class="text-slate-800 dark:text-slate-200">${d.reason}</p>
+                            <p class="text-slate-400 text-[11px] pt-1">Total Dana Escrow Ditahan: <b class="text-amber-500">Rp${Number(d.total_amount).toLocaleString('id-ID')}</b></p>
+                        </div>
+
+                        ${d.status === 'open' ? `
+                            <button onclick="openDisputeModal(${d.id})" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-extrabold text-xs transition flex items-center gap-2">
+                                <i class="fa-solid fa-gavel"></i> Mediasi & Eksekusi Penyelesaian Dana
+                            </button>
+                        ` : `
+                            <p class="text-[11px] text-emerald-600 font-bold">Catatan Resolusi: ${d.resolution_notes || 'Telah diselesaikan.'}</p>
+                        `}
+                    </div>
+                `).join('');
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function openDisputeModal(disputeId) {
+            activeDisputeId = disputeId;
+            document.getElementById('modal-resolve-dispute').classList.remove('hidden');
+        }
+
+        function closeDisputeModal() {
+            document.getElementById('modal-resolve-dispute').classList.add('hidden');
+        }
+
+        function toggleSplitInput() {
+            const type = document.getElementById('disp-res-type').value;
+            document.getElementById('box-split-percent').classList.toggle('hidden', type !== 'resolved_split');
+        }
+
+        function adjustSplitPct(changed) {
+            if (changed === 'worker') {
+                const w = Math.min(100, Math.max(0, parseInt(document.getElementById('disp-worker-pct').value) || 0));
+                document.getElementById('disp-employer-pct').value = 100 - w;
+            } else {
+                const e = Math.min(100, Math.max(0, parseInt(document.getElementById('disp-employer-pct').value) || 0));
+                document.getElementById('disp-worker-pct').value = 100 - e;
+            }
+        }
+
+        async function submitResolveDispute() {
+            const resolution_type = document.getElementById('disp-res-type').value;
+            const worker_percentage = document.getElementById('disp-worker-pct').value;
+            const employer_percentage = document.getElementById('disp-employer-pct').value;
+            const resolution_notes = document.getElementById('disp-notes').value;
+
+            try {
+                const res = await fetch(`/api/admin/disputes/${activeDisputeId}/resolve`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        resolution_type,
+                        worker_percentage,
+                        employer_percentage,
+                        resolution_notes
+                    })
+                });
+                const json = await res.json();
+                alert(json.message);
+                closeDisputeModal();
+                loadData();
+                loadDisputes();
+            } catch (err) {
+                console.error(err);
+                alert('Gagal mengeksekusi sengketa.');
+            }
+        }
+
+        async function loadKycs() {
+            try {
+                const res = await fetch('/api/admin/kyc-verifications');
+                const json = await res.json();
+                const container = document.getElementById('admin-kyc-feed');
+
+                container.innerHTML = json.data.map(k => `
+                    <div class="p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3 text-xs">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h4 class="font-black text-slate-900 dark:text-white text-sm">${k.full_name} (${k.role.toUpperCase()})</h4>
+                                <p class="text-[11px] text-slate-500">${k.email || k.phone_number}</p>
+                            </div>
+                            <span class="px-2.5 py-0.5 rounded-full font-bold text-[10px] ${k.kyc_status === 'verified' ? 'bg-emerald-500/20 text-emerald-500' : 'bg-amber-500/20 text-amber-500'}">${k.kyc_status.toUpperCase()}</span>
+                        </div>
+
+                        <div class="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 space-y-1 font-mono">
+                            <span class="text-slate-400 text-[10px]">NIK KTP Terdekripsi Aman (AES-256):</span>
+                            <p class="font-extrabold text-slate-900 dark:text-white text-sm">${k.nik_decrypted}</p>
+                        </div>
+
+                        ${k.kyc_status !== 'verified' ? `
+                            <div class="flex gap-2">
+                                <button onclick="approveKyc(${k.kyc_id})" class="px-4 py-2 rounded-xl bg-emerald-600 text-white font-bold text-xs hover:bg-emerald-500 transition">
+                                    <i class="fa-solid fa-check"></i> Setujui KYC
+                                </button>
+                                <button onclick="rejectKyc(${k.kyc_id})" class="px-4 py-2 rounded-xl bg-rose-600 text-white font-bold text-xs hover:bg-rose-500 transition">
+                                    <i class="fa-solid fa-xmark"></i> Tolak
+                                </button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `).join('');
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function approveKyc(kycId) {
+            const res = await fetch(`/api/admin/kyc/${kycId}/approve`, { method: 'POST' });
+            const json = await res.json();
+            alert(json.message);
+            loadKycs();
+        }
+
+        async function rejectKyc(kycId) {
+            const reason = prompt('Masukkan alasan penolakan KTP:');
+            if (!reason) return;
+            const res = await fetch(`/api/admin/kyc/${kycId}/reject`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ reason })
+            });
+            const json = await res.json();
+            alert(json.message);
+            loadKycs();
+        }
+
+        async function loadWithdrawals() {
+            try {
+                const res = await fetch('/api/admin/withdrawals');
+                const json = await res.json();
+                const container = document.getElementById('admin-withdrawals-feed');
+
+                if (json.data.length === 0) {
+                    container.innerHTML = `
+                        <div class="p-8 bg-slate-50 dark:bg-slate-950 rounded-2xl text-center text-xs text-slate-500">
+                            <i class="fa-solid fa-receipt text-slate-400 text-3xl mb-2"></i>
+                            <p class="font-bold">Belum Ada Riwayat Pencairan Saldo Dompet</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = json.data.map(w => `
+                    <div class="p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 flex justify-between items-center text-xs">
+                        <div>
+                            <span class="font-bold text-slate-900 dark:text-white">${w.full_name} (${w.bank_name})</span>
+                            <p class="text-[11px] text-slate-500 font-mono">Rek: ${w.account_number} a.n ${w.account_holder}</p>
+                            <p class="text-[10px] text-slate-400">${new Date(w.created_at).toLocaleString('id-ID')}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-black text-emerald-600 dark:text-emerald-400 text-sm">Rp${Number(w.amount).toLocaleString('id-ID')}</p>
+                            <span class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase bg-emerald-500/20 text-emerald-500">${w.status}</span>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (err) {
+                console.error(err);
+            }
         }
 
         async function triggerCronJob() {
